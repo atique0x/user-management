@@ -6,6 +6,7 @@ import { EditUsersComponent } from './edit-users/edit-users.component';
 const routes: Routes = [
   { path: '', component: DisplayUsersComponent },
   { path: 'edit-user', component: EditUsersComponent },
+  { path: 'edit-user/:id', component: EditUsersComponent },
 ];
 
 @NgModule({

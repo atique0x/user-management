@@ -30,6 +30,7 @@
     <table class="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
       <thead class="bg-gray-800 text-white">
         <tr>
+          <th class="py-3 px-4 text-left">SL</th>
           <th class="py-3 px-4 text-left">Name</th>
           <th class="py-3 px-4 text-left">Email</th>
           <th class="py-3 px-4 text-left">Phone</th>
@@ -40,7 +41,8 @@
         </tr>
       </thead>
       <tbody>
-        <tr class="border-b hover:bg-gray-100" *ngFor="let user of pagedUsers">
+        <tr class="border-b hover:bg-gray-100" *ngFor="let user of pagedUsers;let i=index">
+          <td class="py-3 px-4">{{i+1}}</td>
           <td class="py-3 px-4">{{user.name}}</td>
           <td class="py-3 px-4">{{user.email}}</td>
           <td class="py-3 px-4">{{user.phone}}</td>
@@ -55,10 +57,14 @@
             </button>
           </td>
 
-          <td class="py-3 px-4 text-center">
-            <button
+          <td class="py-3 px-4 text-center flex gap-2">
+            <button (click)="onUpdateUser(user.id)"
               class="px-3 py-1 bg-blue-600 text-white text-sm rounded-lg shadow hover:bg-blue-700 transition duration-200">
-              View
+              Update
+            </button>
+            <button (click)="onDeleteUser(user.id)"
+              class="px-3 py-1 bg-blue-600 text-white text-sm rounded-lg shadow hover:bg-blue-700 transition duration-200">
+              Delete
             </button>
           </td>
         </tr>

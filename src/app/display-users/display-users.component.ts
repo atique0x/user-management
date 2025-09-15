@@ -93,7 +93,21 @@ export class DisplayUsersComponent implements OnInit {
     this.usersService.toggleActiveStatus(userId);
   }
 
+  onDeleteUser(userId: string | undefined) {
+    if (!userId) return;
+    const isDelete = confirm('Are you sure you want to delete this user?');
+    if (!isDelete) return;
+    this.usersService.deleteUser(userId);
+    this.users = this.usersService.getUsers;
+    this.getPagedUsers();
+  }
+
   onAddUser() {
     this.router.navigate(['/edit-user']);
+  }
+
+  onUpdateUser(userId: string | undefined) {
+    if (!userId) return;
+    this.router.navigate(['/edit-user', userId]);
   }
 }
