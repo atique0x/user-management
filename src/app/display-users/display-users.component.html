@@ -1,5 +1,22 @@
 <div class="container mx-auto p-6">
+  <div>
+    <p>Search...</p>
+    <input type="text" placeholder="Search by name, email, or phone"
+      class="border border-gray-300 rounded px-3 py-2 w-full" [(ngModel)]="searchText" />
+  </div>
   <div class="overflow-x-auto">
+    <div>
+      <div>
+        <label for="usersPerPage">Show: </label>
+        <select name="usersPerPage" id="" class="border border-gray-300 bg-gray-100 rounded px-1"
+          [(ngModel)]="usersPerPage" (change)="onUsersPerPageChange()">
+          <option [value]="5">5</option>
+          <option [value]="8">8</option>
+          <option [value]="10">10</option>
+          <option [value]="15">15</option>
+        </select>
+      </div>
+    </div>
     <table class="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
       <thead class="bg-gray-800 text-white">
         <tr>
@@ -13,7 +30,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr class="border-b hover:bg-gray-100" *ngFor="let user of users">
+        <tr class="border-b hover:bg-gray-100" *ngFor="let user of pagedUsers">
           <td class="py-3 px-4">{{user.name}}</td>
           <td class="py-3 px-4">{{user.email}}</td>
           <td class="py-3 px-4">{{user.phone}}</td>
@@ -37,4 +54,29 @@
     </table>
 
 
+
+
+    <div class="flex justify-center items-center space-x-2 mt-6">
+      <button (click)="goPreviousPage()" [disabled]="currentPage === 1"
+        class="px-3 py-1 bg-gray-200 text-gray-700 rounded  transition">
+        Previous
+      </button>
+
+      <span *ngFor="let page of totalPagesArray">
+        <button class="px-3 py-1 rounded transition"
+          [ngClass]="page === currentPage ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'"
+          (click)="goToPage(page)">
+          {{ page }}
+        </button>
+      </span>
+
+      <button class="px-3 py-1 bg-gray-200 text-gray-700 rounded transition" (click)="goNextPage()"
+        [disabled]="currentPage === totalPage"
+        [ngClass]="currentPage === totalPage ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-300'">
+        Next
+      </button>
+    </div>
+
+
   </div>
+</div>
