@@ -1,0 +1,40 @@
+<div class="container mx-auto p-6">
+  <div class="overflow-x-auto">
+    <table class="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
+      <thead class="bg-gray-800 text-white">
+        <tr>
+          <th class="py-3 px-4 text-left">Name</th>
+          <th class="py-3 px-4 text-left">Email</th>
+          <th class="py-3 px-4 text-left">Phone</th>
+          <th class="py-3 px-4 text-left">Date of Birth</th>
+          <th class="py-3 px-4 text-left">Address</th>
+          <th class="py-3 px-4 text-center">Active</th>
+          <th class="py-3 px-4 text-center">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="border-b hover:bg-gray-100" *ngFor="let user of users">
+          <td class="py-3 px-4">{{user.name}}</td>
+          <td class="py-3 px-4">{{user.email}}</td>
+          <td class="py-3 px-4">{{user.phone}}</td>
+          <td class="py-3 px-4">{{user.dob | date}}</td>
+          <td class="py-3 px-4">{{user.address |titlecase}}</td>
+          <td class="py-3 px-4 text-center">
+            <span class="px-2 py-1 text-xs font-semibold rounded-full"
+              [ngClass]="user.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'">
+              {{ user.isActive ? 'Active' : 'Inactive' }}
+            </span>
+          </td>
+
+          <td class="py-3 px-4 text-center">
+            <button
+              class="px-3 py-1 bg-blue-600 text-white text-sm rounded-lg shadow hover:bg-blue-700 transition duration-200">
+              View
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+
+  </div>
