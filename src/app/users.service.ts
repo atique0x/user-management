@@ -54,4 +54,17 @@ export class UsersService {
     this.users = this.users.filter((user) => user.id !== userId);
     this.setUsersToLocalStorage(this.users);
   }
+
+  updateUser(userId: string, updatedUserData: User) {
+    const user = this.users.find((user) => user.id === userId);
+    if (user) {
+      user.name = updatedUserData.name;
+      user.email = updatedUserData.email;
+      user.phone = updatedUserData.phone;
+      user.dob = updatedUserData.dob;
+      user.address = updatedUserData.address;
+      user.isActive = updatedUserData.isActive;
+      this.setUsersToLocalStorage(this.users);
+    }
+  }
 }

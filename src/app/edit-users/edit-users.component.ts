@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { UsersService } from '../users.service';
 import { ActivatedRoute } from '@angular/router';
+import { User } from '../model/user.model';
 
 @Component({
   selector: 'app-edit-users',
@@ -11,7 +12,8 @@ import { ActivatedRoute } from '@angular/router';
 export class EditUsersComponent implements OnInit {
   userForm!: FormGroup;
   isUpdateMode: boolean = false;
-  userId: string = '';
+  updateUserId: string = '';
+  updateUserData: User | undefined;
 
   constructor(
     private usersService: UsersService,
@@ -20,23 +22,35 @@ export class EditUsersComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.route.snapshot.paramMap.get('id')) {
-      this.userId = this.route.snapshot.paramMap.get('id')!;
+      this.updateUserId = this.route.snapshot.paramMap.get('id')!;
+      this.updateUserData = this.usersService.getUsers.find(
+        (user) => user.id === this.updateUserId
+      );
+      console.log(this.updateUserData);
       this.isUpdateMode = true;
     }
 
     this.userForm = new FormGroup({
-      name: new FormControl('', [Validators.required, Validators.minLength(3)]),
-      email: new FormControl('', [Validators.required, Validators.email]),
-      phone: new FormControl('', [
-        Validators.required,
-        Validators.pattern('^01[346789][0-9]{8}$'),
-      ]),
-      dob: new FormControl('', [Validators.required]),
-      address: new FormControl('', [
+      name: new FormControl(this.updateUserData?.name, [
         Validators.required,
         Validators.minLength(3),
       ]),
-      isActive: new FormControl('', [Validators.required]),
+      email: new FormControl(this.updateUserData?.email, [
+        Validators.required,
+        Validators.email,
+      ]),
+      phone: new FormControl(this.updateUserData?.phone, [
+        Validators.required,
+        Validators.pattern('^01[346789][0-9]{8}$'),
+      ]),
+      dob: new FormControl(this.updateUserData?.dob, [Validators.required]),
+      address: new FormControl(this.updateUserData?.address, [
+        Validators.required,
+        Validators.minLength(3),
+      ]),
+      isActive: new FormControl(this.updateUserData?.isActive || '', [
+        Validators.required,
+      ]),
     });
   }
 
@@ -50,6 +64,8 @@ export class EditUsersComponent implements OnInit {
 
       alert('User added successfully!');
     } else {
+      this.usersService.updateUser(this.updateUserId, this.userForm.value);
+      alert('User updated successfully!');
     }
   }
 }
