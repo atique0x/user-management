@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { UsersService } from '../users.service';
 import { User } from '../model/user.model';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-display-users',
@@ -8,7 +9,8 @@ import { User } from '../model/user.model';
   styleUrls: ['./display-users.component.css'],
 })
 export class DisplayUsersComponent implements OnInit {
-  constructor(private usersService: UsersService) {}
+  constructor(private usersService: UsersService, private router: Router) {}
+
   users: User[] = this.usersService.getUsers;
   pagedUsers: User[] = [];
   usersPerPage = 10;
@@ -86,7 +88,12 @@ export class DisplayUsersComponent implements OnInit {
     this.getPagedUsers();
   }
 
-  onToggleActiveStatus(userId: string) {
+  onToggleActiveStatus(userId: string | undefined) {
+    if (!userId) return;
     this.usersService.toggleActiveStatus(userId);
+  }
+
+  onAddUser() {
+    this.router.navigate(['/edit-user']);
   }
 }

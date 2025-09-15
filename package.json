@@ -28,6 +28,7 @@
     "@angular/compiler-cli": "^14.2.0",
     "@types/jasmine": "~4.0.0",
     "@types/node": "^18.19.124",
+    "@types/uuid": "^10.0.0",
     "autoprefixer": "^10.4.21",
     "jasmine-core": "~4.3.0",
     "karma": "~6.4.0",
