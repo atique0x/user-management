@@ -12,4 +12,11 @@ export class UsersService {
   get getUsers() {
     return this.users;
   }
+
+  toggleActiveStatus(userId: string) {
+    const user = this.users.find((user) => user.id === userId);
+    if (user) {
+      user.isActive = !user.isActive;
+    }
+  }
 }

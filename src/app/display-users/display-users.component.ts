@@ -65,7 +65,7 @@ export class DisplayUsersComponent implements OnInit {
 
   //Search Logic
   onSearchChange() {
-    console.log(this.searchText);
+    // console.log(this.searchText);
     if (this.searchText.trim() === '') {
       this.users = this.usersService.getUsers;
     } else {
@@ -84,5 +84,9 @@ export class DisplayUsersComponent implements OnInit {
       this.totalPagesArray.push(i);
     }
     this.getPagedUsers();
+  }
+
+  onToggleActiveStatus(userId: string) {
+    this.usersService.toggleActiveStatus(userId);
   }
 }
