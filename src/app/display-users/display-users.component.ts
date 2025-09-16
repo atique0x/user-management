@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute, Params } from '@angular/router';
 import { UsersService } from '../services/users.service';
-import { User } from '../types/user.types';
-import { UserStatus } from '../data/users-data';
+import { User, UserRole } from '../types/user.types';
+import { UserStatus } from '../types/user.types';
+import { debounceTime } from 'rxjs';
 
 @Component({
   selector: 'app-display-users',
@@ -11,13 +12,16 @@ import { UserStatus } from '../data/users-data';
 })
 export class DisplayUsersComponent implements OnInit {
   users: User[] = [];
+  role: UserRole = UserRole.Default;
 
   currentPage = 1;
   itemsPerPage = 10;
   totalPages = 1;
 
-  statusFilter: UserStatus = 'all';
   searchText: string = '';
+  statusFilter: UserStatus = 'all';
+
+  roles = Object.values(UserRole);
 
   constructor(
     private usersService: UsersService,
@@ -30,55 +34,47 @@ export class DisplayUsersComponent implements OnInit {
       this.currentPage = params['page'] ? +params['page'] : 1;
       this.itemsPerPage = params['limit'] ? +params['limit'] : 10;
       this.statusFilter = params['status'] ? params['status'] : 'all';
+      this.role = params['role'] ? params['role'] : 'default';
       this.searchText = params['search'] || '';
       this.loadUsers();
     });
+
+    this.usersService.search$
+      .pipe(debounceTime(500))
+      .subscribe((text: string) => {
+        this.currentPage = 1;
+        this.updateQueryParams({ page: 1, search: text });
+      });
   }
 
-  //-------------------Page Change Logic---------------------
   onPageChange(newPage: number): void {
-    this.router.navigate([], {
-      queryParams: { page: newPage },
-      queryParamsHandling: 'merge',
-    });
+    this.updateQueryParams({ page: newPage });
   }
 
-  //-------------------Items Per Page Change Logic---------------------
   onItemsPerPageChange(): void {
-    this.router.navigate([], {
-      queryParams: {
-        limit: this.itemsPerPage,
-      },
-      queryParamsHandling: 'merge',
-    });
+    this.updateQueryParams({ limit: this.itemsPerPage });
   }
 
-  //-------------------Status Filter Logic---------------------
   onStatusFilterChange() {
-    this.router.navigate([], {
-      queryParams: {
-        status: this.statusFilter,
-      },
-      queryParamsHandling: 'merge',
-    });
+    this.updateQueryParams({ status: this.statusFilter });
+  }
+
+  onRoleFiltered() {
+    this.updateQueryParams({ role: this.role });
   }
 
   onSearchChange(): void {
-    this.router.navigate([], {
-      queryParams: { search: this.searchText, page: null },
-      queryParamsHandling: 'merge',
-    });
-    this.loadUsers();
+    this.usersService.setSearchText(this.searchText);
   }
 
-  //-------------- User Active Status Logic--------------
   onToggleActiveStatus(userId?: string): void {
     if (!userId) return;
-    this.usersService.toggleActiveStatus(userId);
-    this.loadUsers();
+    if (confirm('Are you sure you want to change active status?')) {
+      this.usersService.toggleActiveStatus(userId);
+      this.loadUsers();
+    }
   }
 
-  //------------------User Delete Logic--------------------
   onDeleteUser(isActive: boolean, userId?: string): void {
     if (!userId) return;
 
@@ -93,12 +89,10 @@ export class DisplayUsersComponent implements OnInit {
     }
   }
 
-  //------------------User Add Logic--------------------
   onAddUser(): void {
     this.router.navigate(['/edit-user']);
   }
 
-  //----------------- User Update Logic-------------------
   onUpdateUser(isActive: boolean, userId?: string): void {
     if (!userId) return;
     if (!isActive) {
@@ -108,25 +102,29 @@ export class DisplayUsersComponent implements OnInit {
     this.router.navigate(['/edit-user', userId]);
   }
 
-  //------------------- Load Users Logic-------------------
   private loadUsers(): void {
     const { users, totalUsers } = this.usersService.getPaginatedUsers(
       this.currentPage,
       this.itemsPerPage,
       this.statusFilter,
+      this.role,
       this.searchText
     );
 
-    this.totalPages = Math.ceil(totalUsers / this.itemsPerPage);
+    this.totalPages = Math.max(Math.ceil(totalUsers / this.itemsPerPage), 1);
 
     if (this.currentPage > this.totalPages) {
       this.currentPage = this.totalPages;
-      this.router.navigate([], {
-        queryParams: { page: this.currentPage },
-        queryParamsHandling: 'merge',
-      });
+      this.updateQueryParams({ page: this.currentPage });
     }
 
     this.users = users;
+  }
+
+  private updateQueryParams(params: any): void {
+    this.router.navigate([], {
+      queryParams: params,
+      queryParamsHandling: 'merge',
+    });
   }
 }

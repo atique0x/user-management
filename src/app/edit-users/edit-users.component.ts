@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UsersService } from '../services/users.service';
-import { User } from '../types/user.types';
+import { User, UserRole } from '../types/user.types';
 
 @Component({
   selector: 'app-edit-users',
@@ -11,6 +11,7 @@ import { User } from '../types/user.types';
 })
 export class EditUsersComponent implements OnInit {
   userForm!: FormGroup;
+  roles = Object.values(UserRole);
 
   isUpdateMode: boolean = false;
 
@@ -66,6 +67,9 @@ export class EditUsersComponent implements OnInit {
         Validators.minLength(3),
       ]),
       isActive: new FormControl(this.updateUserData?.isActive || '', [
+        Validators.required,
+      ]),
+      role: new FormControl(this.updateUserData?.role || '', [
         Validators.required,
       ]),
     });

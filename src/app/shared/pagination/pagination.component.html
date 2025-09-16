@@ -4,13 +4,13 @@
     Previous
   </button>
 
-  <span *ngFor="let page of pages">
+  <span *ngFor="let page of [].constructor(totalPages); let i = index">
     <button class="px-3 py-1 rounded-md font-medium transition" [ngClass]="
-          page === currentPage
+          i+1 === currentPage
             ? 'bg-blue-600 text-white shadow-md'
             : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-        " (click)="goToPage(page)">
-      {{ page }}
+        " (click)="goToPage(i+1)">
+      {{ i+1 }}
     </button>
   </span>
 

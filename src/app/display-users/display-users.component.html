@@ -7,12 +7,15 @@
         class="w-full md:w-1/2 border border-gray-300 rounded-md px-4 py-1.5  transition flex-1 outline-none"
         [(ngModel)]="searchText" (input)="onSearchChange()" />
 
-      <!-- Add User + Per Page -->
-      <div class="flex items-center gap-4">
+      <div>
         <button (click)="onAddUser()"
           class="px-4 py-2 bg-blue-500 text-white text-sm font-medium rounded-lg shadow-md hover:bg-blue-700  transition">
           Add User
         </button>
+      </div>
+
+      <!-- Add User + Per Page -->
+      <div class="flex items-center gap-4">
 
         <div class="flex items-center gap-4">
           <!-- All Filter -->
@@ -39,6 +42,17 @@
 
 
         </div>
+
+        <div class="flex items-center gap-2">
+          <label for="itemsPerPage" class="text-gray-700 font-medium">Filtered by role</label>
+          <select name="itemsPerPage" id="itemsPerPage" [(ngModel)]="role" (change)="onRoleFiltered()"
+            class="border rounded px-2 py-1">
+            <option *ngFor="let role of roles" [ngValue]="role">
+              {{ role | titlecase }}
+            </option>
+          </select>
+        </div>
+
 
 
         <div class="flex items-center gap-2">
@@ -67,13 +81,14 @@
           <th class="py-3 px-4 text-left">Date of Birth</th>
           <th class="py-3 px-4 text-left">Address</th>
           <th class="py-3 px-4 text-center">Active</th>
+          <th class="py-3 px-4 text-center">Role</th>
           <th class="py-3 px-4 text-center">Action</th>
         </tr>
       </thead>
       <tbody>
         <tr class="border-b even:bg-gray-50 odd:bg-white hover:bg-blue-50 transition"
           *ngFor="let user of users;let i = index">
-          <td class="py-3 px-4 font-medium text-gray-800">{{ i+1}}</td>
+          <td class="py-3 px-4 font-medium text-gray-800">{{ i + 1 + (currentPage - 1) * itemsPerPage }}</td>
           <td class="py-3 px-4 font-medium text-gray-800">{{ user.name }}</td>
           <td class="py-3 px-4 text-gray-600">{{ user.email }}</td>
           <td class="py-3 px-4 text-gray-600">{{ user.phone }}</td>
@@ -89,6 +104,10 @@
                 {{ user.isActive ? 'Active' : 'Inactive' }}
               </span>
             </button>
+          </td>
+
+          <td class="py-3 px-4">
+            {{ user.role | titlecase }}
           </td>
 
           <td class="py-3 px-4 text-center flex gap-2 justify-center">

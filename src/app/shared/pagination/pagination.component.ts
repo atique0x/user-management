@@ -33,8 +33,4 @@ export class PaginationComponent implements OnInit {
       this.pageChange.emit(page);
     }
   }
-
-  get pages(): number[] {
-    return Array.from({ length: this.totalPages }, (_, i) => i + 1);
-  }
 }

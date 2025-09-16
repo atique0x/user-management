@@ -5,5 +5,17 @@ export interface User {
   phone: string;
   dob: string;
   address: string;
+  role?: UserRole;
   isActive: boolean;
+}
+
+export type UserStatus = 'all' | 'active' | 'inactive';
+
+export enum UserRole {
+  Default = 'default',
+  Admin = 'admin',
+  Guest = 'guest',
+  Moderator = 'moderator',
+  Editor = 'editor',
+  Subscriber = 'subscriber',
 }
