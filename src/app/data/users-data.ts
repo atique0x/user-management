@@ -1,4 +1,6 @@
-import { User } from './user.model';
+import { User } from '../types/user.types';
+
+export type UserStatus = 'all' | 'active' | 'inactive';
 
 export const USERS: User[] = [
   {

@@ -6,9 +6,10 @@ import { AppComponent } from './app.component';
 import { DisplayUsersComponent } from './display-users/display-users.component';
 import { EditUsersComponent } from './edit-users/edit-users.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { PaginationComponent } from './shared/pagination/pagination.component';
 
 @NgModule({
-  declarations: [AppComponent, DisplayUsersComponent, EditUsersComponent],
+  declarations: [AppComponent, DisplayUsersComponent, EditUsersComponent, PaginationComponent],
   imports: [BrowserModule, AppRoutingModule, FormsModule, ReactiveFormsModule],
   providers: [],
   bootstrap: [AppComponent],

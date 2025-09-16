@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { UsersService } from '../users.service';
-import { User } from '../model/user.model';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute, Params } from '@angular/router';
+import { UsersService } from '../services/users.service';
+import { User } from '../types/user.types';
+import { UserStatus } from '../data/users-data';
 
 @Component({
   selector: 'app-display-users',
@@ -9,111 +10,125 @@ import { Router } from '@angular/router';
   styleUrls: ['./display-users.component.css'],
 })
 export class DisplayUsersComponent implements OnInit {
-  constructor(private usersService: UsersService, private router: Router) {}
+  users: User[] = [];
 
-  users: User[] = this.usersService.getUsers;
+  currentPage = 1;
+  itemsPerPage = 10;
+  totalPages = 1;
 
-  pagedUsers: User[] = [];
-  usersPerPage = 10;
+  statusFilter: UserStatus = 'all';
   searchText: string = '';
 
-  currentPage: number = 1;
-  totalPage = Math.ceil(this.users.length / this.usersPerPage);
-  totalPagesArray: number[] = [];
+  constructor(
+    private usersService: UsersService,
+    private router: Router,
+    private route: ActivatedRoute
+  ) {}
 
   ngOnInit(): void {
-    // console.log(this.totalPage);
-    this.getPagedUsers();
-    for (let i = 1; i <= this.totalPage; i++) {
-      this.totalPagesArray.push(i);
-    }
-    // console.log(this.totalPagesArray);
+    this.route.queryParams.subscribe((params: Params) => {
+      this.currentPage = params['page'] ? +params['page'] : 1;
+      this.itemsPerPage = params['limit'] ? +params['limit'] : 10;
+      this.statusFilter = params['status'] ? params['status'] : 'all';
+      this.loadUsers();
+    });
   }
 
-  //----------------Pagination Logic------------------
-  getPagedUsers() {
-    const startUserIndex = (this.currentPage - 1) * this.usersPerPage;
-    const endUserIndex = startUserIndex + this.usersPerPage;
-    this.pagedUsers = this.users.slice(startUserIndex, endUserIndex);
-    // console.log(this.pagedUsers);
+  //-------------------Page Change Logic---------------------
+  onPageChange(newPage: number): void {
+    this.router.navigate([], {
+      queryParams: { page: newPage },
+      queryParamsHandling: 'merge',
+    });
   }
 
-  goPreviousPage() {
-    // console.log('Clicked Previous');
-    this.currentPage--;
-    this.getPagedUsers();
+  //-------------------Items Per Page Change Logic---------------------
+  onItemsPerPageChange(): void {
+    this.router.navigate([], {
+      queryParams: {
+        limit: this.itemsPerPage,
+      },
+      queryParamsHandling: 'merge',
+    });
   }
 
-  goToPage(pageNumber: number) {
-    this.currentPage = pageNumber;
-    this.getPagedUsers();
+  //-------------------Status Filter Logic---------------------
+  onStatusFilterChange() {
+    this.router.navigate([], {
+      queryParams: {
+        status: this.statusFilter,
+      },
+      queryParamsHandling: 'merge',
+    });
   }
 
-  goNextPage() {
-    // console.log('Clicked Next');
-    this.currentPage++;
-    this.getPagedUsers();
+  onSearchChange(): void {
+    // if (this.searchText.trim() === '') {
+    //   this.users = this.usersService.getUsers;
+    // } else {
+    //   this.users = this.usersService.getUsers.filter(
+    //     (user) =>
+    //       user.name.toLowerCase().includes(this.searchText.toLowerCase()) ||
+    //       user.email.toLowerCase().includes(this.searchText.toLowerCase()) ||
+    //       user.phone.toLowerCase().includes(this.searchText.toLowerCase())
+    //   );
+    // }
   }
 
-  //----------------Select Per Page User Logic------------------
-  onUsersPerPageChange() {
-    this.currentPage = 1;
-    this.totalPage = Math.ceil(this.users.length / this.usersPerPage);
-
-    this.totalPagesArray = [];
-    for (let i = 1; i <= this.totalPage; i++) {
-      this.totalPagesArray.push(i);
-    }
-    this.getPagedUsers();
-  }
-
-  //----------------Search Logic------------------
-  onSearchChange() {
-    // console.log(this.searchText);
-    if (this.searchText.trim() === '') {
-      this.users = this.usersService.getUsers;
-    } else {
-      this.users = this.usersService.getUsers.filter(
-        (user) =>
-          user.name.toLowerCase().includes(this.searchText.toLowerCase()) ||
-          user.email.toLowerCase().includes(this.searchText.toLowerCase()) ||
-          user.phone.toLowerCase().includes(this.searchText.toLowerCase())
-      );
-    }
-    this.currentPage = 1;
-    this.totalPage = Math.ceil(this.users.length / this.usersPerPage);
-
-    this.totalPagesArray = [];
-    for (let i = 1; i <= this.totalPage; i++) {
-      this.totalPagesArray.push(i);
-    }
-    this.getPagedUsers();
-  }
-
-  //----------------User Active Status Logic------------------
-  onToggleActiveStatus(userId: string | undefined) {
+  //-------------- User Active Status Logic--------------
+  onToggleActiveStatus(userId?: string): void {
     if (!userId) return;
     this.usersService.toggleActiveStatus(userId);
+    this.loadUsers();
   }
 
-  //----------------User Delete Logic------------------
-  onDeleteUser(userId: string | undefined) {
+  //------------------User Delete Logic--------------------
+  onDeleteUser(isActive: boolean, userId?: string): void {
     if (!userId) return;
-    const isDelete = confirm('Are you sure you want to delete this user?');
-    if (!isDelete) return;
-    this.usersService.deleteUser(userId);
-    this.users = this.usersService.getUsers;
-    this.getPagedUsers();
+
+    if (isActive) {
+      alert("User is active. Doesn't remove user.");
+      return;
+    }
+
+    if (confirm('Are you sure you want to delete this user?')) {
+      this.usersService.deleteUser(userId);
+      this.loadUsers();
+    }
   }
 
-  //----------------User Add Logic------------------
-  onAddUser() {
+  //------------------User Add Logic--------------------
+  onAddUser(): void {
     this.router.navigate(['/edit-user']);
   }
 
-  //----------------User Update Logic------------------
-  onUpdateUser(userId: string | undefined) {
+  //----------------- User Update Logic-------------------
+  onUpdateUser(isActive: boolean, userId?: string): void {
     if (!userId) return;
+    if (!isActive) {
+      alert("User is inactive. Can't update user.");
+      return;
+    }
     this.router.navigate(['/edit-user', userId]);
+  }
+
+  //------------------- Load Users Logic-------------------
+  private loadUsers(): void {
+    const { users, totalUsers } = this.usersService.getPaginatedUsers(
+      this.currentPage,
+      this.itemsPerPage,
+      this.statusFilter
+    );
+    this.totalPages = Math.ceil(totalUsers / this.itemsPerPage);
+
+    if (this.currentPage > this.totalPages) {
+      this.currentPage = this.totalPages;
+      this.router.navigate([], {
+        queryParams: { page: this.currentPage },
+        queryParamsHandling: 'merge',
+      });
+    }
+
+    this.users = users;
   }
 }
