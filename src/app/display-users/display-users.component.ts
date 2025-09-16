@@ -30,6 +30,7 @@ export class DisplayUsersComponent implements OnInit {
       this.currentPage = params['page'] ? +params['page'] : 1;
       this.itemsPerPage = params['limit'] ? +params['limit'] : 10;
       this.statusFilter = params['status'] ? params['status'] : 'all';
+      this.searchText = params['search'] || '';
       this.loadUsers();
     });
   }
@@ -63,16 +64,11 @@ export class DisplayUsersComponent implements OnInit {
   }
 
   onSearchChange(): void {
-    // if (this.searchText.trim() === '') {
-    //   this.users = this.usersService.getUsers;
-    // } else {
-    //   this.users = this.usersService.getUsers.filter(
-    //     (user) =>
-    //       user.name.toLowerCase().includes(this.searchText.toLowerCase()) ||
-    //       user.email.toLowerCase().includes(this.searchText.toLowerCase()) ||
-    //       user.phone.toLowerCase().includes(this.searchText.toLowerCase())
-    //   );
-    // }
+    this.router.navigate([], {
+      queryParams: { search: this.searchText, page: null },
+      queryParamsHandling: 'merge',
+    });
+    this.loadUsers();
   }
 
   //-------------- User Active Status Logic--------------
@@ -117,8 +113,10 @@ export class DisplayUsersComponent implements OnInit {
     const { users, totalUsers } = this.usersService.getPaginatedUsers(
       this.currentPage,
       this.itemsPerPage,
-      this.statusFilter
+      this.statusFilter,
+      this.searchText
     );
+
     this.totalPages = Math.ceil(totalUsers / this.itemsPerPage);
 
     if (this.currentPage > this.totalPages) {

@@ -19,13 +19,25 @@ export class UsersService {
   getPaginatedUsers(
     page: number,
     itemsPerPage: number,
-    status: UserStatus = 'all'
+    status: UserStatus = 'all',
+    searchText: string
   ): { users: User[]; totalUsers: number } {
     //Filtered Users
     let filtered = [...this.users];
     if (status === 'active') filtered = filtered.filter((u) => u.isActive);
     else if (status === 'inactive')
       filtered = filtered.filter((u) => !u.isActive);
+
+    //Search Filter
+    if (searchText) {
+      const lowerSearchText = searchText.toLowerCase();
+      filtered = filtered.filter(
+        (u) =>
+          u.name.toLowerCase().includes(lowerSearchText) ||
+          u.email.toLowerCase().includes(lowerSearchText) ||
+          u.phone.toLowerCase().includes(lowerSearchText)
+      );
+    }
 
     //Paginated Users
     const totalUsers = filtered.length;
