@@ -12,6 +12,7 @@ export class UsersService {
       this.setUsersToLocalStorage();
     }
   }
+
   setUsersToLocalStorage(users: User[] = USERS) {
     localStorage.setItem('users', JSON.stringify(users));
   }
@@ -37,6 +38,7 @@ export class UsersService {
 
   addUser(user: User) {
     const { name, email, phone, dob, address, isActive } = user;
+    const activity = String(isActive) === 'true' ? true : false;
     const newUser: User = {
       id: uuidv4(),
       name,
@@ -44,7 +46,7 @@ export class UsersService {
       phone,
       dob,
       address,
-      isActive: isActive,
+      isActive: activity,
     };
     this.users.unshift(newUser);
     this.setUsersToLocalStorage(this.users);

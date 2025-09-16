@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { UsersService } from '../users.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { User } from '../model/user.model';
 
 @Component({
@@ -11,12 +11,14 @@ import { User } from '../model/user.model';
 })
 export class EditUsersComponent implements OnInit {
   userForm!: FormGroup;
+
   isUpdateMode: boolean = false;
   updateUserId: string = '';
   updateUserData: User | undefined;
 
   constructor(
     private usersService: UsersService,
+    private router: Router,
     private route: ActivatedRoute
   ) {}
 
@@ -29,7 +31,11 @@ export class EditUsersComponent implements OnInit {
       console.log(this.updateUserData);
       this.isUpdateMode = true;
     }
+    this.userFormInit();
+  }
 
+  //----------------User Form Initialization------------------
+  userFormInit() {
     this.userForm = new FormGroup({
       name: new FormControl(this.updateUserData?.name, [
         Validators.required,
@@ -54,15 +60,17 @@ export class EditUsersComponent implements OnInit {
     });
   }
 
+  //---------------Form Submission------------------
   onUserFormSubmit() {
     if (!this.isUpdateMode) {
+      console.log(this.userForm.value);
       this.usersService.addUser(this.userForm.value);
       this.userForm.reset();
       this.userForm.patchValue({
         isActive: '',
       });
-
       alert('User added successfully!');
+      this.router.navigate(['']);
     } else {
       this.usersService.updateUser(this.updateUserId, this.userForm.value);
       alert('User updated successfully!');

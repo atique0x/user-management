@@ -1,7 +1,8 @@
 <form [formGroup]="userForm" (ngSubmit)="onUserFormSubmit()"
   class="max-w-lg mx-auto bg-white p-6 rounded-lg shadow-md space-y-4 my-10">
 
-  <legend class="text-center font-semibold text-3xl">User Information</legend>
+  <legend class="text-center font-semibold text-xl"><span>{{isUpdateMode? 'Update':'Add'}} </span>User Information
+  </legend>
 
   <!-- Name -->
   <div class="flex flex-col">
@@ -75,7 +76,7 @@
   <div class="pt-4">
     <button type="submit" [disabled]="userForm.invalid"
       class="w-full bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:bg-blue-700 transition disabled:bg-gray-400">
-      Add User
+      {{ isUpdateMode ? 'Update User' : 'Add User' }}
     </button>
   </div>
 </form>

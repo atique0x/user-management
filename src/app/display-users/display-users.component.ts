@@ -12,6 +12,7 @@ export class DisplayUsersComponent implements OnInit {
   constructor(private usersService: UsersService, private router: Router) {}
 
   users: User[] = this.usersService.getUsers;
+
   pagedUsers: User[] = [];
   usersPerPage = 10;
   searchText: string = '';
@@ -29,7 +30,7 @@ export class DisplayUsersComponent implements OnInit {
     // console.log(this.totalPagesArray);
   }
 
-  //Pagination Logic
+  //----------------Pagination Logic------------------
   getPagedUsers() {
     const startUserIndex = (this.currentPage - 1) * this.usersPerPage;
     const endUserIndex = startUserIndex + this.usersPerPage;
@@ -54,6 +55,7 @@ export class DisplayUsersComponent implements OnInit {
     this.getPagedUsers();
   }
 
+  //----------------Select Per Page User Logic------------------
   onUsersPerPageChange() {
     this.currentPage = 1;
     this.totalPage = Math.ceil(this.users.length / this.usersPerPage);
@@ -65,7 +67,7 @@ export class DisplayUsersComponent implements OnInit {
     this.getPagedUsers();
   }
 
-  //Search Logic
+  //----------------Search Logic------------------
   onSearchChange() {
     // console.log(this.searchText);
     if (this.searchText.trim() === '') {
@@ -88,11 +90,13 @@ export class DisplayUsersComponent implements OnInit {
     this.getPagedUsers();
   }
 
+  //----------------User Active Status Logic------------------
   onToggleActiveStatus(userId: string | undefined) {
     if (!userId) return;
     this.usersService.toggleActiveStatus(userId);
   }
 
+  //----------------User Delete Logic------------------
   onDeleteUser(userId: string | undefined) {
     if (!userId) return;
     const isDelete = confirm('Are you sure you want to delete this user?');
@@ -102,10 +106,12 @@ export class DisplayUsersComponent implements OnInit {
     this.getPagedUsers();
   }
 
+  //----------------User Add Logic------------------
   onAddUser() {
     this.router.navigate(['/edit-user']);
   }
 
+  //----------------User Update Logic------------------
   onUpdateUser(userId: string | undefined) {
     if (!userId) return;
     this.router.navigate(['/edit-user', userId]);

@@ -1,34 +1,38 @@
 <div class="container mx-auto p-6">
-  <section>
-    <div>
+  <!-- Top Controls -->
+  <section class="mb-6">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-10 w-full ">
+      <!-- Search -->
       <input type="text" placeholder="Search by name, email, or phone"
-        class="border border-gray-300 rounded-lg px-4 py-2 w-full focus:outline-none " [(ngModel)]="searchText"
-        (input)="onSearchChange()" />
-    </div>
+        class="w-full md:w-1/2 border border-gray-300 rounded-md px-4 py-1.5  transition flex-1 outline-none"
+        [(ngModel)]="searchText" (input)="onSearchChange()" />
 
-    <div class="flex justify-between my-2 space-x-2 font-medium">
-      <div>
+      <!-- Add User + Per Page -->
+      <div class="flex items-center gap-4">
         <button (click)="onAddUser()"
-          class="px-3 py-1 bg-blue-500 text-white text-sm rounded-lg shadow hover:bg-blue-600 transition duration-200">Add
-          User</button>
-      </div>
-      <div>
-        <label for="usersPerPage" class="text-gray-700 ">Show: </label>
-        <select name="usersPerPage" id="usersPerPage"
-          class="border border-gray-300 bg-gray-100 rounded-lg px-1 focus:outline-none " [(ngModel)]="usersPerPage"
-          (change)="onUsersPerPageChange()">
-          <option [value]="5">5</option>
-          <option [value]="8">8</option>
-          <option [value]="10">10</option>
-          <option [value]="15">15</option>
-        </select>
+          class="px-4 py-2 bg-blue-500 text-white text-sm font-medium rounded-lg shadow-md hover:bg-blue-700  transition">
+          Add User
+        </button>
+
+        <div class="flex items-center gap-2">
+          <label for="usersPerPage" class="text-gray-700 font-medium">Show</label>
+          <select name="usersPerPage" id="usersPerPage"
+            class="border border-gray-300 bg-white rounded-lg px-2 py-1  transition" [(ngModel)]="usersPerPage"
+            (change)="onUsersPerPageChange()">
+            <option [value]="5">5</option>
+            <option [value]="8">8</option>
+            <option [value]="10">10</option>
+            <option [value]="15">15</option>
+          </select>
+        </div>
       </div>
     </div>
   </section>
-  <div class="overflow-x-auto">
 
-    <table class="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
-      <thead class="bg-gray-800 text-white">
+  <!-- Table -->
+  <div class="overflow-x-auto rounded-xl shadow-md">
+    <table class="min-w-full border border-gray-200 bg-white rounded-xl overflow-hidden">
+      <thead class="bg-gradient-to-r from-gray-800 to-gray-700 text-white">
         <tr>
           <th class="py-3 px-4 text-left">SL</th>
           <th class="py-3 px-4 text-left">Name</th>
@@ -41,61 +45,61 @@
         </tr>
       </thead>
       <tbody>
-        <tr class="border-b hover:bg-gray-100" *ngFor="let user of pagedUsers;let i=index">
-          <td class="py-3 px-4">{{i+1}}</td>
-          <td class="py-3 px-4">{{user.name}}</td>
-          <td class="py-3 px-4">{{user.email}}</td>
-          <td class="py-3 px-4">{{user.phone}}</td>
-          <td class="py-3 px-4">{{user.dob | date}}</td>
-          <td class="py-3 px-4">{{user.address |titlecase}}</td>
+        <tr class="border-b even:bg-gray-50 odd:bg-white hover:bg-blue-50 transition"
+          *ngFor="let user of pagedUsers; let i = index">
+          <td class="py-3 px-4">{{ i + 1 }}</td>
+          <td class="py-3 px-4 font-medium text-gray-800">{{ user.name }}</td>
+          <td class="py-3 px-4 text-gray-600">{{ user.email }}</td>
+          <td class="py-3 px-4 text-gray-600">{{ user.phone }}</td>
+          <td class="py-3 px-4">{{ user.dob | date }}</td>
+          <td class="py-3 px-4">{{ user.address | titlecase }}</td>
           <td class="py-3 px-4 text-center">
             <button (click)="onToggleActiveStatus(user.id)">
-              <span class="px-4 py-1 text-xs font-semibold rounded-full"
-                [ngClass]="user.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'">
+              <span class="px-4 py-1 text-xs font-semibold rounded-full" [ngClass]="
+                  user.isActive
+                    ? 'bg-green-100 text-green-700'
+                    : 'bg-red-100 text-red-600'
+                ">
                 {{ user.isActive ? 'Active' : 'Inactive' }}
               </span>
             </button>
           </td>
 
-          <td class="py-3 px-4 text-center flex gap-2">
+          <td class="py-3 px-4 text-center flex gap-2 justify-center">
             <button (click)="onUpdateUser(user.id)"
-              class="px-3 py-1 bg-blue-600 text-white text-sm rounded-lg shadow hover:bg-blue-700 transition duration-200">
+              class="px-3 py-1 bg-blue-500 text-white text-xs rounded-lg shadow hover:bg-blue-700  transition">
               Update
             </button>
             <button (click)="onDeleteUser(user.id)"
-              class="px-3 py-1 bg-blue-600 text-white text-sm rounded-lg shadow hover:bg-blue-700 transition duration-200">
+              class="px-4 py-1 bg-red-500 text-white text-xs rounded-lg shadow hover:bg-red-700  transition">
               Delete
             </button>
           </td>
         </tr>
       </tbody>
     </table>
+  </div>
 
+  <!-- Pagination -->
+  <div class="flex justify-center items-center gap-2 mt-6">
+    <button (click)="goPreviousPage()" [disabled]="currentPage === 1"
+      class="px-3 py-1 rounded-md bg-gray-200 text-gray-700 font-medium transition disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-300">
+      Previous
+    </button>
 
-
-
-    <div class="flex justify-center items-center space-x-2 mt-6">
-      <button (click)="goPreviousPage()" [disabled]="currentPage === 1"
-        class="px-3 py-1 bg-gray-200 text-gray-700 rounded  transition"
-        [ngClass]="currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-300'">
-        Previous
+    <span *ngFor="let page of totalPagesArray">
+      <button class="px-3 py-1 rounded-md font-medium transition" [ngClass]="
+          page === currentPage
+            ? 'bg-blue-600 text-white shadow-md'
+            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+        " (click)="goToPage(page)">
+        {{ page }}
       </button>
+    </span>
 
-      <span *ngFor="let page of totalPagesArray">
-        <button class="px-3 py-1 rounded transition"
-          [ngClass]="page === currentPage ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'"
-          (click)="goToPage(page)">
-          {{ page }}
-        </button>
-      </span>
-
-      <button class="px-3 py-1 bg-gray-200 text-gray-700 rounded transition" (click)="goNextPage()"
-        [disabled]="currentPage === totalPage"
-        [ngClass]="currentPage === totalPage ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-300'">
-        Next
-      </button>
-    </div>
-
-
+    <button (click)="goNextPage()" [disabled]="currentPage === totalPage"
+      class="px-7 py-1 rounded-md bg-gray-200 text-gray-700 font-medium transition disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-300">
+      Next
+    </button>
   </div>
 </div>
