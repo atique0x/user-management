@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UsersService } from '../services/users.service';
-import { User, UserRole } from '../types/user.types';
+import { User } from '../types/user.interface';
+import { UserRole } from '../types/user-role.enum';
 
 @Component({
   selector: 'app-edit-users',
@@ -11,9 +12,11 @@ import { User, UserRole } from '../types/user.types';
 })
 export class EditUsersComponent implements OnInit {
   userForm!: FormGroup;
-  isUpdateMode: boolean = false;
-  updateUserId: string | null = null;
+
+  isUpdateMode = false;
+  updateUserId = '';
   updateUserData?: User;
+
   roles = Object.values(UserRole);
 
   constructor(
@@ -23,8 +26,9 @@ export class EditUsersComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.updateUserId = this.route.snapshot.paramMap.get('id');
-    if (this.updateUserId) {
+    const userId = this.route.snapshot.paramMap.get('id');
+    if (userId) {
+      this.updateUserId = userId;
       this.updateUserData = this.usersService.getUserById(this.updateUserId);
       if (this.updateUserData) this.isUpdateMode = true;
     }
@@ -33,6 +37,7 @@ export class EditUsersComponent implements OnInit {
 
   onUserFormSubmit(): void {
     if (this.userForm.invalid) return;
+    console.log(this.userForm.value);
     if (this.isUpdateMode && this.updateUserId) {
       this.usersService.updateUser(this.updateUserId, this.userForm.value);
       this.router.navigate(['']);
@@ -45,39 +50,44 @@ export class EditUsersComponent implements OnInit {
   }
 
   private userFormInit(): void {
+    const data = this.updateUserData ?? {
+      name: '',
+      email: '',
+      phone: '',
+      dob: '',
+      address: '',
+      isActive: false,
+      role: UserRole.Guest,
+    };
+
     this.userForm = new FormGroup({
-      name: new FormControl(this.updateUserData?.name || '', [
+      name: new FormControl(data.name, [
         Validators.required,
         Validators.minLength(3),
       ]),
-      email: new FormControl(this.updateUserData?.email || '', [
+      email: new FormControl(data.email, [
         Validators.required,
         Validators.email,
       ]),
-      phone: new FormControl(this.updateUserData?.phone || '', [
+      phone: new FormControl(data.phone, [
         Validators.required,
         Validators.pattern('^01[346789][0-9]{8}$'),
       ]),
-      dob: new FormControl(this.updateUserData?.dob || '', [
-        Validators.required,
-      ]),
-      address: new FormControl(this.updateUserData?.address || '', [
+      dob: new FormControl(data.dob, [Validators.required]),
+      address: new FormControl(data.address, [
         Validators.required,
         Validators.minLength(3),
       ]),
-      isActive: new FormControl(this.updateUserData?.isActive || '', [
-        Validators.required,
-      ]),
-      role: new FormControl(this.updateUserData?.role || '', [
-        Validators.required,
-      ]),
+      isActive: new FormControl(data.isActive, [Validators.required]),
+      role: new FormControl(data.role, [Validators.required]),
     });
   }
 
   private formReset(): void {
     this.userForm.reset();
     this.userForm.patchValue({
-      isActive: '',
+      isActive: false,
+      role: UserRole.Guest,
     });
   }
 }

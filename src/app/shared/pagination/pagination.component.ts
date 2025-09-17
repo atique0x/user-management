@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { UsersService } from '../../services/users.service';
 
 @Component({
   selector: 'app-pagination',
@@ -7,9 +6,9 @@ import { UsersService } from '../../services/users.service';
   styleUrls: ['./pagination.component.css'],
 })
 export class PaginationComponent implements OnInit {
-  @Input() currentPage: number = 1;
-  @Input() itemsPerPage: number = 10;
-  @Input() totalPages!: number;
+  @Input() currentPage = 1;
+  @Input() itemsPerPage = 10;
+  @Input() totalPages = 1;
   @Output() pageChange = new EventEmitter<number>();
 
   constructor() {}

@@ -1,4 +1,5 @@
-import { User, UserRole } from '../types/user.types';
+import { UserRole } from '../types/user-role.enum';
+import { User } from '../types/user.interface';
 
 export const USERS: User[] = [
   {

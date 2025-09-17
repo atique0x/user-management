@@ -1,9 +1,11 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router, ActivatedRoute, Params } from '@angular/router';
 import { UsersService } from '../services/users.service';
-import { ItemsPerPage, User, UserRole } from '../types/user.types';
-import { UserStatus } from '../types/user.types';
 import { debounceTime, Subscription } from 'rxjs';
+import { User } from '../types/user.interface';
+import { ItemsPerPage } from '../types/item-per-page.enum';
+import { UserStatus } from '../types/user-status.type';
+import { UserRole } from '../types/user-role.enum';
 
 @Component({
   selector: 'app-display-users',
@@ -12,16 +14,17 @@ import { debounceTime, Subscription } from 'rxjs';
 })
 export class DisplayUsersComponent implements OnInit, OnDestroy {
   users: User[] = [];
-  role: UserRole | 'default' = 'default';
-  itemsPerPageOptions: number[] = Object.values(ItemsPerPage).filter(
-    (v) => typeof v === 'number'
-  ) as number[];
+
+  itemsPerPageOptions: number[] = [];
   currentPage = 1;
   itemsPerPage: ItemsPerPage = ItemsPerPage.Ten;
   totalPages = 1;
-  searchText: string = '';
+
+  searchText = '';
   statusFilter: UserStatus = 'all';
+  role: UserRole | 'default' = 'default';
   roles = Object.values(UserRole);
+
   private subscriptions: Subscription[] = [];
 
   constructor(
@@ -31,7 +34,10 @@ export class DisplayUsersComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    console.log(this.roles);
+    this.itemsPerPageOptions = Object.values(ItemsPerPage).filter(
+      (v) => typeof v === 'number'
+    ) as number[];
+
     const queryParamsSub = this.route.queryParams.subscribe(
       (params: Params) => {
         this.currentPage = params['page'] ? +params['page'] : 1;
@@ -43,6 +49,7 @@ export class DisplayUsersComponent implements OnInit, OnDestroy {
       }
     );
     this.subscriptions.push(queryParamsSub);
+
     const searchSub = this.usersService.search$
       .pipe(debounceTime(500))
       .subscribe((text: string) => {
@@ -60,11 +67,11 @@ export class DisplayUsersComponent implements OnInit, OnDestroy {
     this.updateQueryParams({ limit: this.itemsPerPage });
   }
 
-  onStatusFilterChange() {
+  onStatusFilterChange(): void {
     this.updateQueryParams({ status: this.statusFilter });
   }
 
-  onRoleFiltered() {
+  onRoleFiltered(): void {
     this.updateQueryParams({ role: this.role });
   }
 
@@ -94,7 +101,7 @@ export class DisplayUsersComponent implements OnInit, OnDestroy {
     if (!userId) return;
     const user = this.usersService.getUserById(userId);
     if (user && !user.isActive) {
-      alert("User is inactive. Can't update user.");
+      alert(`${user.name} is inactive, can't update.`);
       return;
     }
     this.router.navigate(['/edit-user', userId]);
@@ -116,7 +123,15 @@ export class DisplayUsersComponent implements OnInit, OnDestroy {
     this.users = users;
   }
 
-  private updateQueryParams(params: any): void {
+  private updateQueryParams(
+    params: Partial<{
+      page: number;
+      limit: number;
+      status: UserStatus;
+      role: UserRole | 'default';
+      search: string;
+    }>
+  ): void {
     this.router.navigate([], {
       queryParams: params,
       queryParamsHandling: 'merge',

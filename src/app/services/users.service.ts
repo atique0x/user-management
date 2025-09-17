@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
 import { v4 as uuidv4 } from 'uuid';
-import { User, UserRole, UserStatus } from '../types/user.types';
 import { USERS } from '../data/users-data';
 import { Subject } from 'rxjs';
+import { User } from '../types/user.interface';
+import { UserStatus } from '../types/user-status.type';
+import { UserRole } from '../types/user-role.enum';
 
 @Injectable({
   providedIn: 'root',
@@ -29,12 +31,11 @@ export class UsersService {
     role: UserRole | 'default' = 'default',
     searchText: string = ''
   ): { users: User[]; totalUsers: number } {
-    let filtered = this.applyFilters(this.users, status, role, searchText);
+    const filtered = this.applyFilters(this.users, status, role, searchText);
 
     const totalUsers = filtered.length;
     const start = (page - 1) * itemsPerPage;
     const paginatedUsers = filtered.slice(start, start + itemsPerPage);
-
     return { users: paginatedUsers, totalUsers };
   }
 
@@ -47,10 +48,10 @@ export class UsersService {
   }
 
   addUser(user: User): void {
+    console.log(user.isActive);
     const newUser: User = {
       id: uuidv4(),
       ...user,
-      isActive: user.isActive === 'true',
     };
     this.users = [newUser, ...this.users];
     this.setUsersToLocalStorage();
@@ -66,7 +67,6 @@ export class UsersService {
       this.users[index] = {
         ...this.users[index],
         ...updatedUserData,
-        isActive: updatedUserData.isActive === 'true',
       };
       this.setUsersToLocalStorage();
     }
@@ -79,7 +79,7 @@ export class UsersService {
       return;
     }
     if (user.isActive) {
-      alert(`User "${user.name}" is active. Cannot delete.`);
+      alert(`${user.name} is active, can't delete.`);
       return;
     }
     if (confirm(`Are you sure you want to delete "${user.name}"?`)) {
@@ -108,6 +108,7 @@ export class UsersService {
     searchText: string
   ): User[] {
     let filtered = [...users];
+
     //Filter by active status
     if (status === 'active') filtered = filtered.filter((u) => u.isActive);
     else if (status === 'inactive')
