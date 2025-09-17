@@ -11,11 +11,10 @@ import { User, UserRole } from '../types/user.types';
 })
 export class EditUsersComponent implements OnInit {
   userForm!: FormGroup;
-  roles = Object.values(UserRole);
-
   isUpdateMode: boolean = false;
   updateUserId: string | null = null;
   updateUserData?: User;
+  roles = Object.values(UserRole);
 
   constructor(
     private usersService: UsersService,
@@ -32,10 +31,8 @@ export class EditUsersComponent implements OnInit {
     this.userFormInit();
   }
 
-  // Form Submission
   onUserFormSubmit(): void {
     if (this.userForm.invalid) return;
-
     if (this.isUpdateMode && this.updateUserId) {
       this.usersService.updateUser(this.updateUserId, this.userForm.value);
       this.router.navigate(['']);
@@ -47,7 +44,6 @@ export class EditUsersComponent implements OnInit {
     }
   }
 
-  // User Form Initialization
   private userFormInit(): void {
     this.userForm = new FormGroup({
       name: new FormControl(this.updateUserData?.name || '', [

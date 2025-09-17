@@ -13,19 +13,15 @@ import { debounceTime, Subscription } from 'rxjs';
 export class DisplayUsersComponent implements OnInit, OnDestroy {
   users: User[] = [];
   role: UserRole | 'default' = 'default';
-
   itemsPerPageOptions: number[] = Object.values(ItemsPerPage).filter(
     (v) => typeof v === 'number'
   ) as number[];
   currentPage = 1;
   itemsPerPage: ItemsPerPage = ItemsPerPage.Ten;
   totalPages = 1;
-
   searchText: string = '';
   statusFilter: UserStatus = 'all';
-
   roles = Object.values(UserRole);
-
   private subscriptions: Subscription[] = [];
 
   constructor(
@@ -47,7 +43,6 @@ export class DisplayUsersComponent implements OnInit, OnDestroy {
       }
     );
     this.subscriptions.push(queryParamsSub);
-
     const searchSub = this.usersService.search$
       .pipe(debounceTime(500))
       .subscribe((text: string) => {
@@ -87,7 +82,6 @@ export class DisplayUsersComponent implements OnInit, OnDestroy {
 
   onDeleteUser(userId?: string): void {
     if (!userId) return;
-
     this.usersService.deleteUser(userId);
     this.loadUsers();
   }
@@ -114,9 +108,7 @@ export class DisplayUsersComponent implements OnInit, OnDestroy {
       this.role,
       this.searchText
     );
-
     this.totalPages = Math.max(Math.ceil(totalUsers / this.itemsPerPage), 1);
-
     if (this.currentPage > this.totalPages) {
       this.currentPage = this.totalPages;
       this.updateQueryParams({ page: this.currentPage });
