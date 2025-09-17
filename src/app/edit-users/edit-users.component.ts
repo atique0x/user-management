@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { UsersService } from '../services/users.service';
+
 import { User } from '../types/user.interface';
 import { UserRole } from '../types/user-role.enum';
 
+import { UsersService } from '../services/users.service';
 @Component({
   selector: 'app-edit-users',
   templateUrl: './edit-users.component.html',

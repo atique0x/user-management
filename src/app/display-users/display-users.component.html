@@ -18,17 +18,6 @@
         class="flex flex-wrap items-center gap-3 bg-blue-50 border rounded-lg px-4 py-1"
       >
         <span class="text-gray-700 font-medium">Status:</span>
-        <!-- <label class="flex items-center gap-1 cursor-pointer">
-          <input
-            type="radio"
-            name="statusFilter"
-            [(ngModel)]="statusFilter"
-            [value]="'all'"
-            (change)="onStatusFilterChange()"
-            class="h-4 w-4 text-blue-600 border-gray-300"
-          />
-          All
-        </label> -->
         <label class="flex items-center gap-1 cursor-pointer">
           <input
             type="radio"
@@ -166,8 +155,13 @@
         </tr>
 
         <tr
-          class="border-b even:bg-gray-50 odd:bg-white hover:bg-blue-50 transition"
+          class="border-b transition"
           *ngFor="let user of users; let i = index"
+          [ngClass]="{
+            'bg-green-100 ': user.id === markedUserId,
+            'even:bg-gray-50 odd:bg-white hover:bg-blue-50':
+              user.id !== markedUserId
+          }"
         >
           <td class="py-3 px-4 font-medium text-gray-800">
             {{ i + 1 + (currentPage - 1) * itemsPerPage }}

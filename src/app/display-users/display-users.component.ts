@@ -1,11 +1,13 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router, ActivatedRoute, Params } from '@angular/router';
-import { UsersService } from '../services/users.service';
 import { debounceTime, Subscription } from 'rxjs';
+
 import { User } from '../types/user.interface';
 import { ItemsPerPage } from '../types/item-per-page.enum';
 import { UserStatus } from '../types/user-status.type';
 import { UserRole } from '../types/user-role.enum';
+
+import { UsersService } from '../services/users.service';
 
 @Component({
   selector: 'app-display-users',
@@ -23,6 +25,8 @@ export class DisplayUsersComponent implements OnInit, OnDestroy {
   searchText = '';
   statusFilter: UserStatus = 'active';
   role: UserRole | 'default' = 'default';
+  markedUserId?: string;
+
   roles = Object.values(UserRole);
 
   private subscriptions: Subscription[] = [];
@@ -79,28 +83,26 @@ export class DisplayUsersComponent implements OnInit, OnDestroy {
     this.usersService.setSearchText(this.searchText);
   }
 
-  onToggleActiveStatus(userId?: string): void {
-    if (!userId) return;
-    if (confirm('Are you sure you want to change active status?')) {
-      this.usersService.toggleActiveStatus(userId);
-
-      this.loadUsers();
-    }
-  }
-
   onAddUser(): void {
     this.router.navigate(['/add-user']);
   }
 
   onUpdateUser(userId?: string): void {
     if (!userId) return;
-    this.router.navigate(['/add-user', userId]);
+    this.router.navigate(['/edit-user', userId]);
   }
 
   onDeleteUser(userId?: string): void {
     if (!userId) return;
     this.usersService.deleteUser(userId);
     this.loadUsers();
+  }
+
+  onToggleActiveStatus(userId?: string): void {
+    if (!userId) return;
+    this.usersService.toggleActiveStatus(userId);
+    this.markedUserId = userId;
+    this.onTogglePageChange(this.markedUserId);
   }
 
   private loadUsers(): void {
@@ -117,6 +119,26 @@ export class DisplayUsersComponent implements OnInit, OnDestroy {
       this.updateQueryParams({ page: this.currentPage });
     }
     this.users = users;
+  }
+
+  private onTogglePageChange(userId?: string) {
+    if (!userId) return;
+
+    const user = this.usersService.getUserById(userId);
+    if (!user) return;
+
+    this.statusFilter = user.isActive ? 'active' : 'inactive';
+    const page = this.usersService.getPageOfUser(
+      userId,
+      this.itemsPerPage,
+      this.statusFilter,
+      this.role,
+      this.searchText
+    );
+    this.updateQueryParams({ status: this.statusFilter, page });
+    setTimeout(() => {
+      this.markedUserId = undefined;
+    }, 5000);
   }
 
   private updateQueryParams(
