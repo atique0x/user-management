@@ -1,1 +1,1 @@
-export type UserStatus = 'all' | 'active' | 'inactive';
+export type UserStatus = 'active' | 'inactive';

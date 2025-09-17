@@ -37,7 +37,7 @@ export class EditUsersComponent implements OnInit {
 
   onUserFormSubmit(): void {
     if (this.userForm.invalid) return;
-    console.log(this.userForm.value);
+
     if (this.isUpdateMode && this.updateUserId) {
       this.usersService.updateUser(this.updateUserId, this.userForm.value);
       this.router.navigate(['']);
@@ -56,7 +56,6 @@ export class EditUsersComponent implements OnInit {
       phone: '',
       dob: '',
       address: '',
-      isActive: false,
       role: UserRole.Guest,
     };
 
@@ -78,7 +77,6 @@ export class EditUsersComponent implements OnInit {
         Validators.required,
         Validators.minLength(3),
       ]),
-      isActive: new FormControl(data.isActive, [Validators.required]),
       role: new FormControl(data.role, [Validators.required]),
     });
   }
@@ -86,7 +84,6 @@ export class EditUsersComponent implements OnInit {
   private formReset(): void {
     this.userForm.reset();
     this.userForm.patchValue({
-      isActive: false,
       role: UserRole.Guest,
     });
   }

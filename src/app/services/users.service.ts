@@ -24,10 +24,18 @@ export class UsersService {
     this.searchSubject.next(text);
   }
 
+  toggleActiveStatus(userId: string): void {
+    const user = this.getUserById(userId);
+    if (user) {
+      user.isActive = !user.isActive;
+      this.setUsersToLocalStorage();
+    }
+  }
+
   getPaginatedUsers(
     page: number,
     itemsPerPage: number,
-    status: UserStatus = 'all',
+    status: UserStatus = 'active',
     role: UserRole | 'default' = 'default',
     searchText: string = ''
   ): { users: User[]; totalUsers: number } {
@@ -39,20 +47,8 @@ export class UsersService {
     return { users: paginatedUsers, totalUsers };
   }
 
-  toggleActiveStatus(userId: string): void {
-    const user = this.getUserById(userId);
-    if (user) {
-      user.isActive = !user.isActive;
-      this.setUsersToLocalStorage();
-    }
-  }
-
   addUser(user: User): void {
-    console.log(user.isActive);
-    const newUser: User = {
-      id: uuidv4(),
-      ...user,
-    };
+    const newUser: User = { id: uuidv4(), ...user, isActive: false };
     this.users = [newUser, ...this.users];
     this.setUsersToLocalStorage();
   }
@@ -64,40 +60,17 @@ export class UsersService {
   updateUser(userId: string, updatedUserData: User): void {
     const index = this.users.findIndex((u) => u.id === userId);
     if (index !== -1) {
-      this.users[index] = {
-        ...this.users[index],
-        ...updatedUserData,
-      };
+      this.users[index] = { ...this.users[index], ...updatedUserData };
       this.setUsersToLocalStorage();
     }
   }
 
   deleteUser(userId: string): void {
     const user = this.getUserById(userId);
-    if (!user) {
-      alert('User not found.');
-      return;
-    }
-    if (user.isActive) {
-      alert(`${user.name} is active, can't delete.`);
-      return;
-    }
+    if (!user) return;
     if (confirm(`Are you sure you want to delete "${user.name}"?`)) {
       this.users = this.users.filter((u) => u.id !== userId);
       this.setUsersToLocalStorage();
-    }
-  }
-
-  private setUsersToLocalStorage(): void {
-    localStorage.setItem('users', JSON.stringify(this.users));
-  }
-
-  private getUsersFromLocalStorage(): User[] {
-    try {
-      const usersData = localStorage.getItem('users');
-      return usersData ? (JSON.parse(usersData) as User[]) : [];
-    } catch {
-      return [];
     }
   }
 
@@ -128,5 +101,18 @@ export class UsersService {
       filtered = filtered.filter((u) => u.role === role);
     }
     return filtered;
+  }
+
+  private setUsersToLocalStorage(): void {
+    localStorage.setItem('users', JSON.stringify(this.users));
+  }
+
+  private getUsersFromLocalStorage(): User[] {
+    try {
+      const usersData = localStorage.getItem('users');
+      return usersData ? (JSON.parse(usersData) as User[]) : [];
+    } catch {
+      return [];
+    }
   }
 }

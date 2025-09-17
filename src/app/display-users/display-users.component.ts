@@ -21,7 +21,7 @@ export class DisplayUsersComponent implements OnInit, OnDestroy {
   totalPages = 1;
 
   searchText = '';
-  statusFilter: UserStatus = 'all';
+  statusFilter: UserStatus = 'active';
   role: UserRole | 'default' = 'default';
   roles = Object.values(UserRole);
 
@@ -42,7 +42,7 @@ export class DisplayUsersComponent implements OnInit, OnDestroy {
       (params: Params) => {
         this.currentPage = params['page'] ? +params['page'] : 1;
         this.itemsPerPage = params['limit'] ? +params['limit'] : 10;
-        this.statusFilter = params['status'] ? params['status'] : 'all';
+        this.statusFilter = params['status'] ? params['status'] : 'active';
         this.role = params['role'] ? params['role'] : 'default';
         this.searchText = params['search'] || '';
         this.loadUsers();
@@ -83,28 +83,24 @@ export class DisplayUsersComponent implements OnInit, OnDestroy {
     if (!userId) return;
     if (confirm('Are you sure you want to change active status?')) {
       this.usersService.toggleActiveStatus(userId);
+
       this.loadUsers();
     }
+  }
+
+  onAddUser(): void {
+    this.router.navigate(['/add-user']);
+  }
+
+  onUpdateUser(userId?: string): void {
+    if (!userId) return;
+    this.router.navigate(['/add-user', userId]);
   }
 
   onDeleteUser(userId?: string): void {
     if (!userId) return;
     this.usersService.deleteUser(userId);
     this.loadUsers();
-  }
-
-  onAddUser(): void {
-    this.router.navigate(['/edit-user']);
-  }
-
-  onUpdateUser(userId?: string): void {
-    if (!userId) return;
-    const user = this.usersService.getUserById(userId);
-    if (user && !user.isActive) {
-      alert(`${user.name} is inactive, can't update.`);
-      return;
-    }
-    this.router.navigate(['/edit-user', userId]);
   }
 
   private loadUsers(): void {

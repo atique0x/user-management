@@ -18,7 +18,7 @@
         class="flex flex-wrap items-center gap-3 bg-blue-50 border rounded-lg px-4 py-1"
       >
         <span class="text-gray-700 font-medium">Status:</span>
-        <label class="flex items-center gap-1 cursor-pointer">
+        <!-- <label class="flex items-center gap-1 cursor-pointer">
           <input
             type="radio"
             name="statusFilter"
@@ -28,7 +28,7 @@
             class="h-4 w-4 text-blue-600 border-gray-300"
           />
           All
-        </label>
+        </label> -->
         <label class="flex items-center gap-1 cursor-pointer">
           <input
             type="radio"
@@ -131,7 +131,7 @@
           <th class="py-3 px-4 text-left">Phone</th>
           <th class="py-3 px-4 text-left">Date of Birth</th>
           <th class="py-3 px-4 text-left">Address</th>
-          <th class="py-3 px-4 text-center">Active</th>
+          <th class="py-3 px-4 text-center">Status</th>
           <th class="py-3 px-4 text-center">Role</th>
           <th class="py-3 px-4 text-center">Action</th>
         </tr>
@@ -178,33 +178,48 @@
           <td class="py-3 px-4">{{ user.dob | date }}</td>
           <td class="py-3 px-4">{{ user.address | titlecase }}</td>
           <td class="py-3 px-4 text-center">
-            <button (click)="onToggleActiveStatus(user.id)">
-              <span
-                class="px-4 py-1 text-xs font-semibold rounded-full"
-                [ngClass]="
-                  user.isActive
-                    ? 'bg-green-100 text-green-700'
-                    : 'bg-red-100 text-red-600'
-                "
-              >
-                {{ user.isActive ? "Active" : "Inactive" }}
-              </span>
-            </button>
+            <span
+              class="px-4 py-1 text-xs font-semibold rounded-full"
+              [ngClass]="
+                user.isActive
+                  ? 'bg-green-100 text-green-700'
+                  : 'bg-red-100 text-red-600'
+              "
+            >
+              {{ user.isActive ? "Active" : "Inactive" }}
+            </span>
           </td>
           <td class="py-3 px-4">{{ user.role | titlecase }}</td>
-          <td class="py-3 px-4 text-center flex gap-2 justify-center">
-            <button
-              (click)="onUpdateUser(user.id)"
-              class="px-3 py-1 bg-blue-500 text-white text-xs rounded-lg shadow hover:bg-blue-600 transition"
-            >
-              Update
-            </button>
-            <button
-              (click)="onDeleteUser(user.id)"
-              class="px-4 py-1 bg-red-500 text-white text-xs rounded-lg shadow hover:bg-red-600 transition"
-            >
-              Delete
-            </button>
+          <td class="py-3 px-4 text-center">
+            <div *ngIf="user.isActive" class="flex gap-2 justify-center">
+              <button
+                (click)="onUpdateUser(user.id)"
+                class="px-3 py-1 bg-blue-500 text-white text-xs rounded-lg shadow hover:bg-blue-600 transition"
+              >
+                Update
+              </button>
+              <button
+                (click)="onToggleActiveStatus(user.id)"
+                class="px-4 py-1 bg-red-500 text-white text-xs rounded-lg shadow hover:bg-red-600 transition"
+              >
+                Inactivated
+              </button>
+            </div>
+
+            <div *ngIf="!user.isActive" class="flex gap-2 justify-center">
+              <button
+                (click)="onDeleteUser(user.id)"
+                class="px-4 py-1 bg-red-500 text-white text-xs rounded-lg shadow hover:bg-red-600 transition"
+              >
+                Delete
+              </button>
+              <button
+                (click)="onToggleActiveStatus(user.id)"
+                class="px-4 py-1 bg-green-500 text-white text-xs rounded-lg shadow hover:bg-green-600 transition"
+              >
+                Reactivated
+              </button>
+            </div>
           </td>
         </tr>
       </tbody>
