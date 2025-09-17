@@ -14,7 +14,6 @@ export class EditUsersComponent implements OnInit {
   roles = Object.values(UserRole);
 
   isUpdateMode: boolean = false;
-
   updateUserId: string | null = null;
   updateUserData?: User;
 
@@ -35,6 +34,8 @@ export class EditUsersComponent implements OnInit {
 
   // Form Submission
   onUserFormSubmit(): void {
+    if (this.userForm.invalid) return;
+
     if (this.isUpdateMode && this.updateUserId) {
       this.usersService.updateUser(this.updateUserId, this.userForm.value);
       this.router.navigate(['']);
@@ -49,20 +50,22 @@ export class EditUsersComponent implements OnInit {
   // User Form Initialization
   private userFormInit(): void {
     this.userForm = new FormGroup({
-      name: new FormControl(this.updateUserData?.name, [
+      name: new FormControl(this.updateUserData?.name || '', [
         Validators.required,
         Validators.minLength(3),
       ]),
-      email: new FormControl(this.updateUserData?.email, [
+      email: new FormControl(this.updateUserData?.email || '', [
         Validators.required,
         Validators.email,
       ]),
-      phone: new FormControl(this.updateUserData?.phone, [
+      phone: new FormControl(this.updateUserData?.phone || '', [
         Validators.required,
         Validators.pattern('^01[346789][0-9]{8}$'),
       ]),
-      dob: new FormControl(this.updateUserData?.dob, [Validators.required]),
-      address: new FormControl(this.updateUserData?.address, [
+      dob: new FormControl(this.updateUserData?.dob || '', [
+        Validators.required,
+      ]),
+      address: new FormControl(this.updateUserData?.address || '', [
         Validators.required,
         Validators.minLength(3),
       ]),

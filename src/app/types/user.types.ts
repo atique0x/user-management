@@ -6,16 +6,22 @@ export interface User {
   dob: string;
   address: string;
   role?: UserRole;
-  isActive: boolean;
+  isActive: boolean | string;
 }
 
 export type UserStatus = 'all' | 'active' | 'inactive';
 
 export enum UserRole {
-  Default = 'default',
   Admin = 'admin',
   Guest = 'guest',
   Moderator = 'moderator',
   Editor = 'editor',
   Subscriber = 'subscriber',
+}
+
+export enum ItemsPerPage {
+  Five = 5,
+  Ten = 10,
+  Fifteen = 15,
+  Twenty = 20,
 }

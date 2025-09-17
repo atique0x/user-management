@@ -1,94 +1,98 @@
 <form [formGroup]="userForm" (ngSubmit)="onUserFormSubmit()"
-  class="max-w-lg mx-auto bg-white p-6 rounded-lg shadow-md space-y-4 my-10">
+  class="max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-lg space-y-6 my-12 border border-gray-100">
 
-  <legend class="text-center font-semibold text-xl"><span>{{isUpdateMode? 'Update':'Add'}} </span>User Information
-  </legend>
+  <!-- Header -->
+  <h2 class="text-center font-semibold text-2xl text-gray-800">
+    {{ isUpdateMode ? 'Update' : 'Add' }} User Information
+  </h2>
 
   <!-- Name -->
-  <div class="flex flex-col">
-    <label for="name" class="mb-1 font-medium text-gray-700">Name*</label>
+  <div>
+    <label for="name" class="block mb-1 font-medium text-gray-700">Name*</label>
     <input type="text" formControlName="name" id="name"
-      class="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none" placeholder="Enter full name" />
-    <small class="text-red-500" *ngIf="userForm.get('name')?.touched && userForm.get('name')?.invalid">
+      class="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm shadow-sm focus:outline-none"
+      placeholder="Enter full name" />
+    <p class="text-sm text-red-500 mt-1" *ngIf="userForm.get('name')?.touched && userForm.get('name')?.invalid">
       <span *ngIf="userForm.get('name')?.errors?.['required']">Name is required.</span>
       <span *ngIf="userForm.get('name')?.errors?.['minlength']">Name must be at least 3 characters.</span>
-    </small>
+    </p>
   </div>
 
   <!-- Email -->
-  <div class="flex flex-col">
-    <label for="email" class="mb-1 font-medium text-gray-700">Email*</label>
+  <div>
+    <label for="email" class="block mb-1 font-medium text-gray-700">Email*</label>
     <input type="email" formControlName="email" id="email"
-      class="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none" placeholder="Enter email address" />
-    <small class="text-red-500" *ngIf="userForm.get('email')?.touched && userForm.get('email')?.invalid">
+      class="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm shadow-sm focus:outline-none"
+      placeholder="Enter email address" />
+    <p class="text-sm text-red-500 mt-1" *ngIf="userForm.get('email')?.touched && userForm.get('email')?.invalid">
       <span *ngIf="userForm.get('email')?.errors?.['required']">Email is required.</span>
       <span *ngIf="userForm.get('email')?.errors?.['email']">Please provide a valid email.</span>
-    </small>
+    </p>
   </div>
 
   <!-- Phone -->
-  <div class="flex flex-col">
-    <label for="phone" class="mb-1 font-medium text-gray-700">Phone*</label>
+  <div>
+    <label for="phone" class="block mb-1 font-medium text-gray-700">Phone*</label>
     <input type="text" formControlName="phone" id="phone"
-      class="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none" placeholder="Enter phone number" />
-    <small class="text-red-500" *ngIf="userForm.get('phone')?.touched && userForm.get('phone')?.invalid">
+      class="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm shadow-sm focus:outline-none"
+      placeholder="01XXXXXXXXX" />
+    <p class="text-sm text-red-500 mt-1" *ngIf="userForm.get('phone')?.touched && userForm.get('phone')?.invalid">
       <span *ngIf="userForm.get('phone')?.errors?.['required']">Phone number is required.</span>
       <span *ngIf="userForm.get('phone')?.errors?.['pattern']">Provide a valid phone number (01XXXXXXXXX).</span>
-    </small>
+    </p>
   </div>
 
   <!-- Date of Birth -->
-  <div class="flex flex-col">
-    <label for="dob" class="mb-1 font-medium text-gray-700">Date of Birth*</label>
+  <div>
+    <label for="dob" class="block mb-1 font-medium text-gray-700">Date of Birth*</label>
     <input type="date" formControlName="dob" id="dob"
-      class="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none" />
-    <small class="text-red-500" *ngIf="userForm.get('dob')?.touched && userForm.get('dob')?.invalid">
+      class="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm shadow-sm focus:outline-none" />
+    <p class="text-sm text-red-500 mt-1" *ngIf="userForm.get('dob')?.touched && userForm.get('dob')?.invalid">
       Date of Birth is required.
-    </small>
+    </p>
   </div>
 
   <!-- Address -->
-  <div class="flex flex-col">
-    <label for="address" class="mb-1 font-medium text-gray-700">Address*</label>
+  <div>
+    <label for="address" class="block mb-1 font-medium text-gray-700">Address*</label>
     <input type="text" formControlName="address" id="address"
-      class="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none" placeholder="Enter address" />
-    <small class="text-red-500" *ngIf="userForm.get('address')?.touched && userForm.get('address')?.invalid">
+      class="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm shadow-sm focus:outline-none"
+      placeholder="Enter address" />
+    <p class="text-sm text-red-500 mt-1" *ngIf="userForm.get('address')?.touched && userForm.get('address')?.invalid">
       <span *ngIf="userForm.get('address')?.errors?.['required']">Address is required.</span>
       <span *ngIf="userForm.get('address')?.errors?.['minlength']">Address must be at least 3 characters.</span>
-    </small>
+    </p>
   </div>
 
   <!-- Active Status -->
-  <div class="flex flex-col">
-    <label for="activeStatus" class="mb-1 font-medium text-gray-700">Active Status*</label>
+  <div>
+    <label for="activeStatus" class="block mb-1 font-medium text-gray-700">Active Status*</label>
     <select formControlName="isActive" id="activeStatus"
-      class="border border-gray-300 bg-gray-100 rounded-lg px-3 py-2 focus:outline-none">
+      class="w-full border border-gray-300 bg-gray-50 rounded-lg px-4 py-2 text-sm shadow-sm focus:outline-none">
       <option value="" disabled hidden selected>Choose status</option>
       <option [value]="true">Active</option>
       <option [value]="false">Inactive</option>
     </select>
-    <small class="text-red-500" *ngIf="userForm.get('isActive')?.touched && userForm.get('isActive')?.invalid">
+    <p class="text-sm text-red-500 mt-1" *ngIf="userForm.get('isActive')?.touched && userForm.get('isActive')?.invalid">
       Please select active status.
-    </small>
+    </p>
   </div>
 
-  <div class="flex flex-col gap-2">
-    <label class="mb-1 font-medium text-gray-700">User Role*</label>
-    <div *ngFor="let role of roles">
-      <label class="flex items-center gap-2">
-        <input type="radio" formControlName="role" [value]="role"
-          class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500" />
-        {{ role |titlecase}}
+  <!-- User Role -->
+  <div>
+    <label class="block mb-1 font-medium text-gray-700">User Role*</label>
+    <div class="flex flex-wrap gap-4">
+      <label *ngFor="let role of roles" class="flex items-center gap-2 cursor-pointer">
+        <input type="radio" formControlName="role" [value]="role" class="h-4 w-4 text-blue-600 border-gray-300" />
+        <span>{{ role | titlecase }}</span>
       </label>
     </div>
-
   </div>
-
 
   <!-- Submit Button -->
   <div class="pt-4">
     <button type="submit" [disabled]="userForm.invalid"
-      class="w-full bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:bg-blue-700 transition disabled:bg-gray-400">
+      class="w-full bg-blue-600 text-white font-semibold px-6 py-3 rounded-lg shadow-md hover:bg-blue-700 transition disabled:bg-gray-400">
       {{ isUpdateMode ? 'Update User' : 'Add User' }}
     </button>
   </div>
