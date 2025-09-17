@@ -5,7 +5,7 @@ export interface User {
   phone: string;
   dob: string;
   address: string;
-  role?: UserRole;
+  role: UserRole;
   isActive: boolean | string;
 }
 

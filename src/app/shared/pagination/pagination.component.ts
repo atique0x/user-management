@@ -7,13 +7,12 @@ import { UsersService } from '../../services/users.service';
   styleUrls: ['./pagination.component.css'],
 })
 export class PaginationComponent implements OnInit {
-  @Input() currentPage!: number;
+  @Input() currentPage: number = 1;
   @Input() itemsPerPage: number = 10;
   @Input() totalPages!: number;
   @Output() pageChange = new EventEmitter<number>();
 
   constructor() {}
-
   ngOnInit(): void {}
 
   goPreviousPage(): void {

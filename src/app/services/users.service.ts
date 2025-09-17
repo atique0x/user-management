@@ -9,7 +9,6 @@ import { Subject } from 'rxjs';
 })
 export class UsersService {
   private users: User[] = [];
-
   private searchSubject = new Subject<string>();
   readonly search$ = this.searchSubject.asObservable();
 
@@ -32,7 +31,6 @@ export class UsersService {
   ): { users: User[]; totalUsers: number } {
     let filtered = this.applyFilters(this.users, status, role, searchText);
 
-    //Paginate
     const totalUsers = filtered.length;
     const start = (page - 1) * itemsPerPage;
     const paginatedUsers = filtered.slice(start, start + itemsPerPage);
@@ -54,7 +52,6 @@ export class UsersService {
       ...user,
       isActive: user.isActive === 'true',
     };
-
     this.users = [newUser, ...this.users];
     this.setUsersToLocalStorage();
   }
@@ -77,17 +74,14 @@ export class UsersService {
 
   deleteUser(userId: string): void {
     const user = this.getUserById(userId);
-
     if (!user) {
       alert('User not found.');
       return;
     }
-
     if (user.isActive) {
       alert(`User "${user.name}" is active. Cannot delete.`);
       return;
     }
-
     if (confirm(`Are you sure you want to delete "${user.name}"?`)) {
       this.users = this.users.filter((u) => u.id !== userId);
       this.setUsersToLocalStorage();
@@ -114,12 +108,10 @@ export class UsersService {
     searchText: string
   ): User[] {
     let filtered = [...users];
-
     //Filter by active status
     if (status === 'active') filtered = filtered.filter((u) => u.isActive);
     else if (status === 'inactive')
       filtered = filtered.filter((u) => !u.isActive);
-
     // Filter by search text
     if (searchText) {
       const lowerSearchText = searchText.toLowerCase();
@@ -130,12 +122,10 @@ export class UsersService {
           u.phone.toLowerCase().includes(lowerSearchText)
       );
     }
-
     // Filter by role
     if (role && role !== 'default') {
       filtered = filtered.filter((u) => u.role === role);
     }
-
     return filtered;
   }
 }
