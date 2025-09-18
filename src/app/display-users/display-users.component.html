@@ -84,10 +84,9 @@
       <div class="relative">
         <input
           type="text"
+          [formControl]="searchControl"
           placeholder="Search by name, email, or phone..."
           class="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-2 shadow-sm outline-none transition"
-          [(ngModel)]="searchText"
-          (input)="onSearchChange()"
         />
         <svg
           xmlns="http://www.w3.org/2000/svg"

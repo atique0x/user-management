@@ -1,6 +1,3 @@
-import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
-
 import { v4 as uuidv4 } from 'uuid';
 
 import { USERS } from '../data/users-data';
@@ -8,16 +5,11 @@ import { User } from '../types/user.interface';
 import { UserStatus } from '../types/user-status.type';
 import { UserRole } from '../types/user-role.enum';
 
-@Injectable({
-  providedIn: 'root',
-})
 export class UsersService {
   private users: User[] = [];
-  private searchSubject = new Subject<string>();
-  readonly search$ = this.searchSubject.asObservable();
 
   constructor() {
-    const storedUsers = this.getUsersFromLocalStorage();
+    const storedUsers: User[] = this.getUsersFromLocalStorage();
     this.users = storedUsers.length ? storedUsers : USERS;
     this.setUsersToLocalStorage();
   }
@@ -27,14 +19,12 @@ export class UsersService {
     itemsPerPage: number,
     status: UserStatus,
     role: UserRole | 'default',
-    searchText: string = ''
+    searchText: string
   ): { users: User[]; totalUsers: number } {
-    const filtered = this.applyFilters(status, role, searchText);
-
-    const totalUsers = filtered.length;
+    const filtered: User[] = this.applyFilters(status, role, searchText!);
     const start = (page - 1) * itemsPerPage;
     const paginatedUsers = filtered.slice(start, start + itemsPerPage);
-    return { users: paginatedUsers, totalUsers };
+    return { users: paginatedUsers, totalUsers: filtered.length };
   }
 
   getPageOfUser(
@@ -45,10 +35,8 @@ export class UsersService {
     searchText: string
   ): number {
     const filtered = this.applyFilters(status, role, searchText);
-
     const index = filtered.findIndex((u) => u.id === userId);
-    if (index === -1) return 1;
-    return Math.floor(index / itemsPerPage) + 1;
+    return index === -1 ? 1 : Math.floor(index / itemsPerPage) + 1;
   }
 
   getUserById(userId: string): User | undefined {
@@ -62,7 +50,7 @@ export class UsersService {
   }
 
   updateUser(userId: string, updatedUserData: User): void {
-    const index = this.users.findIndex((u) => u.id === userId);
+    const index: number = this.users.findIndex((u) => u.id === userId);
     if (index !== -1) {
       this.users[index] = { ...this.users[index], ...updatedUserData };
       this.setUsersToLocalStorage();
@@ -72,9 +60,6 @@ export class UsersService {
   toggleActiveStatus(userId: string): void {
     const user = this.getUserById(userId);
     if (!user) return;
-    if (!confirm(`Are you sure you want to change status for "${user.name}"?`))
-      return;
-
     user.isActive = !user.isActive;
     this.setUsersToLocalStorage();
   }
@@ -82,22 +67,16 @@ export class UsersService {
   deleteUser(userId: string): void {
     const user = this.getUserById(userId);
     if (!user) return;
-    if (confirm(`Are you sure you want to delete "${user.name}"?`)) {
-      this.users = this.users.filter((u) => u.id !== userId);
-      this.setUsersToLocalStorage();
-    }
-  }
-
-  setSearchText(text: string) {
-    this.searchSubject.next(text);
+    this.users = this.users.filter((u) => u.id !== userId);
+    this.setUsersToLocalStorage();
   }
 
   private applyFilters(
     status: UserStatus,
     role: UserRole | 'default',
-    searchText: string
+    searchText: string | null
   ): User[] {
-    let filtered = [...this.users];
+    let filtered: User[] = [...this.users];
 
     if (status === 'active') filtered = filtered.filter((u) => u.isActive);
     else if (status === 'inactive')

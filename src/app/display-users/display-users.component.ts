@@ -1,12 +1,12 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router, ActivatedRoute, Params } from '@angular/router';
-import { debounceTime, Subscription } from 'rxjs';
+import { FormControl } from '@angular/forms';
+import { debounceTime, distinctUntilChanged, Subscription } from 'rxjs';
 
 import { User } from '../types/user.interface';
 import { ItemsPerPage } from '../types/item-per-page.enum';
 import { UserStatus } from '../types/user-status.type';
 import { UserRole } from '../types/user-role.enum';
-
 import { UsersService } from '../services/users.service';
 
 @Component({
@@ -17,17 +17,19 @@ import { UsersService } from '../services/users.service';
 export class DisplayUsersComponent implements OnInit, OnDestroy {
   users: User[] = [];
 
-  itemsPerPageOptions: number[] = [];
   currentPage = 1;
   itemsPerPage: ItemsPerPage = ItemsPerPage.Ten;
   totalPages = 1;
+  itemsPerPageOptions: number[] = [];
 
-  searchText = '';
+  searchText: string = '';
   statusFilter: UserStatus = 'active';
   role: UserRole | 'default' = 'default';
   markedUserId?: string;
 
-  roles = Object.values(UserRole);
+  searchControl = new FormControl('');
+
+  roles: UserRole[] = Object.values(UserRole);
 
   private subscriptions: Subscription[] = [];
 
@@ -42,6 +44,13 @@ export class DisplayUsersComponent implements OnInit, OnDestroy {
       (v) => typeof v === 'number'
     ) as number[];
 
+    const searchSub = this.searchControl.valueChanges
+      .pipe(debounceTime(500), distinctUntilChanged())
+      .subscribe((val: string | null) => {
+        this.onSearchChange(val);
+      });
+    this.subscriptions.push(searchSub);
+
     const queryParamsSub = this.route.queryParams.subscribe(
       (params: Params) => {
         this.currentPage = params['page'] ? +params['page'] : 1;
@@ -49,18 +58,12 @@ export class DisplayUsersComponent implements OnInit, OnDestroy {
         this.statusFilter = params['status'] ? params['status'] : 'active';
         this.role = params['role'] ? params['role'] : 'default';
         this.searchText = params['search'] || '';
+
+        this.searchControl.setValue(this.searchText, { emitEvent: false });
         this.loadUsers();
       }
     );
     this.subscriptions.push(queryParamsSub);
-
-    const searchSub = this.usersService.search$
-      .pipe(debounceTime(500))
-      .subscribe((text: string) => {
-        this.currentPage = 1;
-        this.updateQueryParams({ page: 1, search: text });
-      });
-    this.subscriptions.push(searchSub);
   }
 
   onPageChange(newPage: number): void {
@@ -79,8 +82,9 @@ export class DisplayUsersComponent implements OnInit, OnDestroy {
     this.updateQueryParams({ role: this.role });
   }
 
-  onSearchChange(): void {
-    this.usersService.setSearchText(this.searchText);
+  onSearchChange(val: string | null): void {
+    this.currentPage = 1;
+    this.updateQueryParams({ page: 1, search: val || '' });
   }
 
   onAddUser(): void {
@@ -94,13 +98,28 @@ export class DisplayUsersComponent implements OnInit, OnDestroy {
 
   onDeleteUser(userId?: string): void {
     if (!userId) return;
+    const user = this.usersService.getUserById(userId);
+    if (!user) return;
+    if (!confirm(`Are you sure you want to delete "${user.name}"?`)) return;
+
     this.usersService.deleteUser(userId);
     this.loadUsers();
   }
 
   onToggleActiveStatus(userId?: string): void {
     if (!userId) return;
+    const user = this.usersService.getUserById(userId);
+    if (!user) return;
+    if (
+      !confirm(
+        `Are you sure you want to ${
+          user.isActive ? 'deactivate' : 'activate'
+        } "${user.name}"?`
+      )
+    )
+      return;
     this.usersService.toggleActiveStatus(userId);
+
     this.markedUserId = userId;
     this.onTogglePageChange(this.markedUserId);
   }
@@ -124,7 +143,7 @@ export class DisplayUsersComponent implements OnInit, OnDestroy {
   private onTogglePageChange(userId?: string) {
     if (!userId) return;
 
-    const user = this.usersService.getUserById(userId);
+    const user: User | undefined = this.usersService.getUserById(userId);
     if (!user) return;
 
     this.statusFilter = user.isActive ? 'active' : 'inactive';
@@ -136,6 +155,7 @@ export class DisplayUsersComponent implements OnInit, OnDestroy {
       this.searchText
     );
     this.updateQueryParams({ status: this.statusFilter, page });
+
     setTimeout(() => {
       this.markedUserId = undefined;
     }, 5000);
