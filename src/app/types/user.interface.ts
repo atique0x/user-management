@@ -9,4 +9,5 @@ export interface User {
   address: string;
   role: UserRole;
   isActive: boolean;
+  isInlineEdit?: boolean;
 }

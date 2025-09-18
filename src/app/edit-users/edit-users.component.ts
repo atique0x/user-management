@@ -12,6 +12,7 @@ import { UserRole } from '../types/user-role.enum';
 
 import { UsersService } from '../services/users.service';
 import { emailExistValidator } from '../validators/email-exist-validator';
+import { FromDataInterface } from '../types/form-data.interface';
 
 @Component({
   selector: 'app-edit-users',
@@ -19,14 +20,7 @@ import { emailExistValidator } from '../validators/email-exist-validator';
   styleUrls: ['./edit-users.component.css'],
 })
 export class EditUsersComponent implements OnInit {
-  userForm!: FormGroup<{
-    name: FormControl<string>;
-    email: FormControl<string>;
-    phone: FormControl<string>;
-    dob: FormControl<string>;
-    address: FormControl<string>;
-    role: FormControl<UserRole>;
-  }>;
+  userForm!: FormGroup<FromDataInterface>;
 
   isUpdateMode = false;
   updateUserId = '';
@@ -85,7 +79,7 @@ export class EditUsersComponent implements OnInit {
         validators: [
           Validators.required,
           Validators.email,
-          emailExistValidator,
+          emailExistValidator(data.email),
         ],
       }),
       phone: new FormControl(data.phone, {

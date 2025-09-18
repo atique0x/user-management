@@ -73,7 +73,7 @@
           (change)="onItemsPerPageChange()"
           class="border rounded-lg px-3 py-1 text-gray-700 w-full md:w-auto"
         >
-          <option *ngFor="let option of itemsPerPageOptions" [ngValue]="option">
+          <option *ngFor="let option of [5, 10, 15, 20]" [ngValue]="option">
             {{ option }}
           </option>
         </select>
@@ -153,68 +153,149 @@
           </td>
         </tr>
 
-        <tr
-          class="border-b transition"
-          *ngFor="let user of users; let i = index"
-          [ngClass]="{
-            'bg-green-100 ': user.id === markedUserId,
-            'even:bg-gray-50 odd:bg-white hover:bg-blue-50':
-              user.id !== markedUserId
-          }"
-        >
-          <td class="py-3 px-4 font-medium text-gray-800">
-            {{ i + 1 + (currentPage - 1) * itemsPerPage }}
-          </td>
-          <td class="py-3 px-4 font-medium text-gray-800">{{ user.name }}</td>
-          <td class="py-3 px-4 text-gray-600">{{ user.email }}</td>
-          <td class="py-3 px-4 text-gray-600">{{ user.phone }}</td>
-          <td class="py-3 px-4">{{ user.dob | date }}</td>
-          <td class="py-3 px-4">{{ user.address | titlecase }}</td>
-          <td class="py-3 px-4 text-center">
-            <span
-              class="px-4 py-1 text-xs font-semibold rounded-full"
-              [ngClass]="
-                user.isActive
-                  ? 'bg-green-100 text-green-700'
-                  : 'bg-red-100 text-red-600'
-              "
-            >
-              {{ user.isActive ? "Active" : "Inactive" }}
-            </span>
-          </td>
-          <td class="py-3 px-4">{{ user.role | titlecase }}</td>
-          <td class="py-3 px-4 text-center">
-            <div *ngIf="user.isActive" class="flex gap-2 justify-center">
-              <button
-                (click)="onUpdateUser(user.id)"
-                class="px-3 py-1 bg-blue-500 text-white text-xs rounded-lg shadow hover:bg-blue-600 transition"
+        <ng-container *ngFor="let user of users; let i = index">
+          <tr
+            *ngIf="editingRowIndex === i"
+            [formGroup]="editRowForm"
+            class="border-b transition"
+            [ngClass]="{
+              'bg-green-100': user.id === markedUserId,
+              'even:bg-gray-50 odd:bg-white hover:bg-blue-50':
+                user.id !== markedUserId
+            }"
+          >
+            <td class="py-3 px-4 font-medium text-gray-800">
+              {{ i + 1 + (currentPage - 1) * itemsPerPage }}
+            </td>
+            <td class="py-3 px-4">
+              <input formControlName="name" class="border p-1 w-full" />
+            </td>
+            <td class="py-3 px-4">
+              <input formControlName="email" class="border p-1 w-full" />
+            </td>
+            <td class="py-3 px-4">
+              <input formControlName="phone" class="border p-1 w-full" />
+            </td>
+            <td class="py-3 px-4">
+              <input
+                type="date"
+                formControlName="dob"
+                class="border p-1 w-full"
+              />
+            </td>
+            <td class="py-3 px-4">
+              <input formControlName="address" class="border p-1 w-full" />
+            </td>
+            <td class="py-3 px-4 text-center">
+              <span
+                [ngClass]="
+                  user.isActive
+                    ? 'bg-green-100 text-green-700'
+                    : 'bg-red-100 text-red-600'
+                "
+                class="px-4 py-1 text-xs font-semibold rounded-full"
               >
-                Update
+                {{ user.isActive ? "Active" : "Inactive" }}
+              </span>
+            </td>
+            <td class="py-3 px-4 text-center">
+              <select formControlName="role" class="border p-1 w-full">
+                <option *ngFor="let role of roles" [value]="role">
+                  {{ role | titlecase }}
+                </option>
+              </select>
+            </td>
+            <td class="py-3 px-4 text-center flex gap-2 justify-center">
+              <button
+                type="button"
+                [disabled]="editRowForm.invalid"
+                (click)="onSaveInlineEdit()"
+                class="px-3 py-1 bg-green-500 text-white text-xs rounded-lg hover:bg-green-600 transition disabled:opacity-50"
+              >
+                Save
               </button>
               <button
-                (click)="onToggleActiveStatus(user.id)"
-                class="px-4 py-1 bg-red-500 text-white text-xs rounded-lg shadow hover:bg-red-600 transition"
+                type="button"
+                (click)="onCancelInlineEdit()"
+                class="px-3 py-1 bg-gray-400 text-white text-xs rounded-lg hover:bg-gray-500 transition"
               >
-                Inactivated
+                Cancel
               </button>
-            </div>
+            </td>
+          </tr>
 
-            <div *ngIf="!user.isActive" class="flex gap-2 justify-center">
-              <button
-                (click)="onDeleteUser(user.id)"
-                class="px-4 py-1 bg-red-500 text-white text-xs rounded-lg shadow hover:bg-red-600 transition"
+          <tr
+            *ngIf="editingRowIndex !== i"
+            class="border-b transition"
+            [ngClass]="{
+              'bg-green-100': user.id === markedUserId,
+              'even:bg-gray-50 odd:bg-white hover:bg-blue-50':
+                user.id !== markedUserId
+            }"
+          >
+            <td class="py-3 px-4 font-medium text-gray-800">
+              {{ i + 1 + (currentPage - 1) * itemsPerPage }}
+            </td>
+            <td class="py-3 px-4">{{ user.name }}</td>
+            <td class="py-3 px-4">{{ user.email }}</td>
+            <td class="py-3 px-4">{{ user.phone }}</td>
+            <td class="py-3 px-4">{{ user.dob | date }}</td>
+            <td class="py-3 px-4">{{ user.address | titlecase }}</td>
+            <td class="py-3 px-4 text-center">
+              <span
+                [ngClass]="
+                  user.isActive
+                    ? 'bg-green-100 text-green-700'
+                    : 'bg-red-100 text-red-600'
+                "
+                class="px-4 py-1 text-xs font-semibold rounded-full"
               >
-                Delete
-              </button>
+                {{ user.isActive ? "Active" : "Inactive" }}
+              </span>
+            </td>
+            <td class="py-3 px-4 text-center">{{ user.role | titlecase }}</td>
+            <td class="py-3 px-4 text-center flex gap-2 justify-center">
               <button
-                (click)="onToggleActiveStatus(user.id)"
-                class="px-4 py-1 bg-green-500 text-white text-xs rounded-lg shadow hover:bg-green-600 transition"
+                type="button"
+                *ngIf="user.isActive"
+                (click)="onInlineEdit(i)"
+                class="px-3 py-1 bg-green-500 text-white text-xs rounded-lg hover:bg-green-600 transition"
               >
-                Reactivated
+                Edit
               </button>
-            </div>
-          </td>
-        </tr>
+
+              <div *ngIf="user.isActive" class="flex gap-2 justify-center">
+                <button
+                  (click)="onUpdateUser(user.id)"
+                  class="px-3 py-1 bg-blue-500 text-white text-xs rounded-lg shadow hover:bg-blue-600 transition"
+                >
+                  Update
+                </button>
+                <button
+                  (click)="onToggleActiveStatus(user.id)"
+                  class="px-4 py-1 bg-red-500 text-white text-xs rounded-lg shadow hover:bg-red-600 transition"
+                >
+                  Inactivate
+                </button>
+              </div>
+
+              <div *ngIf="!user.isActive" class="flex gap-2 justify-center">
+                <button
+                  (click)="onDeleteUser(user.id)"
+                  class="px-4 py-1 bg-red-500 text-white text-xs rounded-lg shadow hover:bg-red-600 transition"
+                >
+                  Delete
+                </button>
+                <button
+                  (click)="onToggleActiveStatus(user.id)"
+                  class="px-4 py-1 bg-green-500 text-white text-xs rounded-lg shadow hover:bg-green-600 transition"
+                >
+                  Reactivate
+                </button>
+              </div>
+            </td>
+          </tr>
+        </ng-container>
       </tbody>
     </table>
   </div>

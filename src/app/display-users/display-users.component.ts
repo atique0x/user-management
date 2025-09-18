@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router, ActivatedRoute, Params } from '@angular/router';
-import { FormControl } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { debounceTime, distinctUntilChanged, Subscription } from 'rxjs';
 
 import { User } from '../types/user.interface';
@@ -8,6 +8,8 @@ import { ItemsPerPage } from '../types/item-per-page.enum';
 import { UserStatus } from '../types/user-status.type';
 import { UserRole } from '../types/user-role.enum';
 import { UsersService } from '../services/users.service';
+import { emailExistValidator } from '../validators/email-exist-validator';
+import { FromDataInterface } from '../types/form-data.interface';
 
 @Component({
   selector: 'app-display-users',
@@ -20,7 +22,6 @@ export class DisplayUsersComponent implements OnInit, OnDestroy {
   currentPage = 1;
   itemsPerPage: ItemsPerPage = ItemsPerPage.Ten;
   totalPages = 1;
-  itemsPerPageOptions: number[] = [];
 
   searchText: string = '';
   statusFilter: UserStatus = 'active';
@@ -31,6 +32,9 @@ export class DisplayUsersComponent implements OnInit, OnDestroy {
   roles: UserRole[] = Object.values(UserRole);
   private subscriptions: Subscription[] = [];
 
+  editRowForm!: FormGroup<FromDataInterface>;
+  editingRowIndex: number | null = null;
+
   constructor(
     private usersService: UsersService,
     private router: Router,
@@ -38,10 +42,6 @@ export class DisplayUsersComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.itemsPerPageOptions = Object.values(ItemsPerPage).filter(
-      (v) => typeof v === 'number'
-    ) as number[];
-
     this.initSearchSubscription();
     this.initQueryParamsSubscription();
   }
@@ -69,6 +69,28 @@ export class DisplayUsersComponent implements OnInit, OnDestroy {
 
   onAddUser(): void {
     this.router.navigate(['/add-user']);
+  }
+
+  onInlineEdit(i: number) {
+    this.editingRowIndex = i;
+    const user = this.users[i];
+    if (!user) return;
+    this.initForm(user);
+  }
+
+  onSaveInlineEdit() {
+    if (!this.editRowForm.valid || this.editingRowIndex === null) return;
+    const updatedUser = {
+      ...this.users[this.editingRowIndex],
+      ...this.editRowForm.value,
+    };
+    this.usersService.updateUser(updatedUser.id!, updatedUser);
+    this.loadUsers();
+    this.editingRowIndex = null;
+  }
+
+  onCancelInlineEdit() {
+    this.editingRowIndex = null;
   }
 
   onUpdateUser(userId?: string): void {
@@ -112,6 +134,7 @@ export class DisplayUsersComponent implements OnInit, OnDestroy {
       this.role,
       this.searchText
     );
+
     this.totalPages = Math.max(Math.ceil(totalUsers / this.itemsPerPage), 1);
     if (this.currentPage > this.totalPages) {
       this.currentPage = this.totalPages;
@@ -164,6 +187,42 @@ export class DisplayUsersComponent implements OnInit, OnDestroy {
       }
     );
     this.subscriptions.push(queryParamsSub);
+  }
+
+  private initForm(user: User) {
+    this.editRowForm = new FormGroup({
+      name: new FormControl(user.name, {
+        nonNullable: true,
+        validators: [Validators.required, Validators.minLength(3)],
+      }),
+      email: new FormControl(user.email, {
+        nonNullable: true,
+        validators: [
+          Validators.required,
+          Validators.email,
+          emailExistValidator(user.email),
+        ],
+      }),
+      phone: new FormControl(user.phone, {
+        nonNullable: true,
+        validators: [
+          Validators.required,
+          Validators.pattern('^01[346789][0-9]{8}$'),
+        ],
+      }),
+      dob: new FormControl(user.dob, {
+        nonNullable: true,
+        validators: [Validators.required],
+      }),
+      address: new FormControl(user.address, {
+        nonNullable: true,
+        validators: [Validators.required, Validators.minLength(3)],
+      }),
+      role: new FormControl(user.role, {
+        nonNullable: true,
+        validators: [Validators.required],
+      }),
+    });
   }
 
   private updateQueryParams(
