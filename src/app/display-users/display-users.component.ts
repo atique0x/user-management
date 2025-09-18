@@ -28,9 +28,7 @@ export class DisplayUsersComponent implements OnInit, OnDestroy {
   markedUserId?: string;
 
   searchControl = new FormControl('');
-
   roles: UserRole[] = Object.values(UserRole);
-
   private subscriptions: Subscription[] = [];
 
   constructor(
@@ -44,26 +42,8 @@ export class DisplayUsersComponent implements OnInit, OnDestroy {
       (v) => typeof v === 'number'
     ) as number[];
 
-    const searchSub = this.searchControl.valueChanges
-      .pipe(debounceTime(500), distinctUntilChanged())
-      .subscribe((val: string | null) => {
-        this.onSearchChange(val);
-      });
-    this.subscriptions.push(searchSub);
-
-    const queryParamsSub = this.route.queryParams.subscribe(
-      (params: Params) => {
-        this.currentPage = params['page'] ? +params['page'] : 1;
-        this.itemsPerPage = params['limit'] ? +params['limit'] : 10;
-        this.statusFilter = params['status'] ? params['status'] : 'active';
-        this.role = params['role'] ? params['role'] : 'default';
-        this.searchText = params['search'] || '';
-
-        this.searchControl.setValue(this.searchText, { emitEvent: false });
-        this.loadUsers();
-      }
-    );
-    this.subscriptions.push(queryParamsSub);
+    this.initSearchSubscription();
+    this.initQueryParamsSubscription();
   }
 
   onPageChange(newPage: number): void {
@@ -159,6 +139,31 @@ export class DisplayUsersComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       this.markedUserId = undefined;
     }, 5000);
+  }
+
+  private initSearchSubscription() {
+    const searchSub = this.searchControl.valueChanges
+      .pipe(debounceTime(500), distinctUntilChanged())
+      .subscribe((val: string | null) => {
+        this.onSearchChange(val);
+      });
+    this.subscriptions.push(searchSub);
+  }
+
+  private initQueryParamsSubscription() {
+    const queryParamsSub = this.route.queryParams.subscribe(
+      (params: Params) => {
+        this.currentPage = params['page'] ? +params['page'] : 1;
+        this.itemsPerPage = params['limit'] ? +params['limit'] : 10;
+        this.statusFilter = params['status'] ? params['status'] : 'active';
+        this.role = params['role'] ? params['role'] : 'default';
+        this.searchText = params['search'] || '';
+
+        this.searchControl.setValue(this.searchText, { emitEvent: false });
+        this.loadUsers();
+      }
+    );
+    this.subscriptions.push(queryParamsSub);
   }
 
   private updateQueryParams(
