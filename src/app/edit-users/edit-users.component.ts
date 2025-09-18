@@ -1,18 +1,32 @@
 import { Component, OnInit } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import {
+  AbstractControl,
+  FormControl,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { User } from '../types/user.interface';
 import { UserRole } from '../types/user-role.enum';
 
 import { UsersService } from '../services/users.service';
+import { emailExistValidator } from '../validators/email-exist-validator';
+
 @Component({
   selector: 'app-edit-users',
   templateUrl: './edit-users.component.html',
   styleUrls: ['./edit-users.component.css'],
 })
 export class EditUsersComponent implements OnInit {
-  userForm!: FormGroup;
+  userForm!: FormGroup<{
+    name: FormControl<string>;
+    email: FormControl<string>;
+    phone: FormControl<string>;
+    dob: FormControl<string>;
+    address: FormControl<string>;
+    role: FormControl<UserRole>;
+  }>;
 
   isUpdateMode = false;
   updateUserId = '';
@@ -39,12 +53,13 @@ export class EditUsersComponent implements OnInit {
   onUserFormSubmit(): void {
     if (this.userForm.invalid) return;
 
+    const formValue = this.userForm.value as Omit<User, 'id' | 'isActive'>;
     if (this.isUpdateMode && this.updateUserId) {
-      this.usersService.updateUser(this.updateUserId, this.userForm.value);
+      this.usersService.updateUser(this.updateUserId, formValue);
       this.router.navigate(['']);
       alert('✅ User updated successfully!');
     } else {
-      this.usersService.addUser(this.userForm.value);
+      this.usersService.addUser(formValue);
       this.formReset();
       alert('✅ User added successfully!');
     }
@@ -61,24 +76,37 @@ export class EditUsersComponent implements OnInit {
     };
 
     this.userForm = new FormGroup({
-      name: new FormControl(data.name, [
-        Validators.required,
-        Validators.minLength(3),
-      ]),
-      email: new FormControl(data.email, [
-        Validators.required,
-        Validators.email,
-      ]),
-      phone: new FormControl(data.phone, [
-        Validators.required,
-        Validators.pattern('^01[346789][0-9]{8}$'),
-      ]),
-      dob: new FormControl(data.dob, [Validators.required]),
-      address: new FormControl(data.address, [
-        Validators.required,
-        Validators.minLength(3),
-      ]),
-      role: new FormControl(data.role, [Validators.required]),
+      name: new FormControl(data.name, {
+        nonNullable: true,
+        validators: [Validators.required, Validators.minLength(3)],
+      }),
+      email: new FormControl(data.email, {
+        nonNullable: true,
+        validators: [
+          Validators.required,
+          Validators.email,
+          emailExistValidator,
+        ],
+      }),
+      phone: new FormControl(data.phone, {
+        nonNullable: true,
+        validators: [
+          Validators.required,
+          Validators.pattern('^01[346789][0-9]{8}$'),
+        ],
+      }),
+      dob: new FormControl(data.dob, {
+        nonNullable: true,
+        validators: [Validators.required],
+      }),
+      address: new FormControl(data.address, {
+        nonNullable: true,
+        validators: [Validators.required, Validators.minLength(3)],
+      }),
+      role: new FormControl(data.role, {
+        nonNullable: true,
+        validators: [Validators.required],
+      }),
     });
   }
 

@@ -55,6 +55,9 @@
       <span *ngIf="userForm.get('email')?.errors?.['email']">
         Please provide a valid email.
       </span>
+      <span *ngIf="userForm.get('email')?.errors?.['emailTaken']">
+        Email already exist, provide another mail.
+      </span>
     </p>
   </div>
 

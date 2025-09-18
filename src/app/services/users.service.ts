@@ -43,13 +43,13 @@ export class UsersService {
     return this.users.find((user) => user.id === userId);
   }
 
-  addUser(user: User): void {
+  addUser(user: Omit<User, 'id' | 'isActive'>): void {
     const newUser: User = { id: uuidv4(), ...user, isActive: false };
     this.users = [newUser, ...this.users];
     this.setUsersToLocalStorage();
   }
 
-  updateUser(userId: string, updatedUserData: User): void {
+  updateUser(userId: string, updatedUserData: Partial<User>): void {
     const index: number = this.users.findIndex((u) => u.id === userId);
     if (index !== -1) {
       this.users[index] = { ...this.users[index], ...updatedUserData };
@@ -109,5 +109,9 @@ export class UsersService {
     } catch {
       return [];
     }
+  }
+
+  get userEmail() {
+    return this.users.map((u) => u.email);
   }
 }
