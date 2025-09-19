@@ -3,6 +3,7 @@
   <button
     (click)="goPreviousPage()"
     [disabled]="currentPage === 1"
+    [disabled]="disabled"
     class="px-4 py-2 rounded-xl bg-gray-100 text-gray-700 font-medium transition disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-200 active:scale-95 shadow-sm"
   >
     Previous
@@ -12,6 +13,7 @@
   <ng-container *ngFor="let page of pageNumbers; let i = index">
     <button
       class="px-4 py-2 rounded-xl font-semibold transition shadow-sm"
+      [disabled]="disabled"
       [ngClass]="
         i + 1 === currentPage
           ? 'bg-blue-600 text-white shadow-md scale-105'
@@ -26,6 +28,7 @@
   <!-- Next Button -->
   <button
     (click)="goNextPage()"
+    [disabled]="disabled"
     [disabled]="currentPage === totalPages"
     class="px-4 py-2 rounded-xl bg-gray-100 text-gray-700 font-medium transition disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-200 active:scale-95 shadow-sm"
   >

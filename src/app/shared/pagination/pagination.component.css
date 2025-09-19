@@ -1,0 +1,10 @@
+button:disabled {
+  opacity: 0.5; /* faded look */
+  cursor: not-allowed; /* indicate disabled */
+  background-color: #f3f4f6; /* light gray */
+  color: #6b7280; /* gray text */
+}
+
+button:hover:not(:disabled) {
+  transition: background-color 0.2s ease-in-out;
+}

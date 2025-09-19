@@ -1,11 +1,4 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnInit,
-  Output,
-  SimpleChanges,
-} from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
   selector: 'app-pagination',
@@ -16,6 +9,7 @@ export class PaginationComponent {
   @Input() currentPage = 1;
   @Input() itemsPerPage = 10;
   @Input() totalPages = 1;
+  @Input() disabled = false;
   @Output() pageChange = new EventEmitter<number>();
 
   goPreviousPage(): void {
