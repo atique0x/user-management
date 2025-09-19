@@ -246,6 +246,20 @@
                 </button>
               </td>
             </tr>
+            <ng-container
+              *ngIf="user.extraColumns?.length && editingRowIndex == i"
+            >
+              <ng-container *ngFor="let row of getExtraColumnRows(user)">
+                <tr class="border">
+                  <td></td>
+                  <td *ngFor="let col of row">
+                    <span>{{ col.name }}:</span>
+                    <span>{{ col.value }}</span>
+                  </td>
+                  <td></td>
+                </tr>
+              </ng-container>
+            </ng-container>
 
             <!-- Normal View Row -->
             <tr
@@ -315,9 +329,9 @@
                 <tr class="border">
                   <td></td>
                   <td *ngFor="let col of row">
-                    <div class="flex flex-col gap-1">
-                      <span class="text-sm font-medium">{{ col.name }}:</span>
-                      <span class="text-gray-600">{{ col.value }}</span>
+                    <div>
+                      <span>{{ col.name }}:</span>
+                      <span>{{ col.value }}</span>
                     </div>
                   </td>
                   <td></td>

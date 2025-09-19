@@ -116,6 +116,7 @@ export class DisplayUsersComponent implements OnInit, OnDestroy {
   onEditAll() {
     this.buildEditAllFrom();
     this.editAll = true;
+    this.editingRowIndex = null;
   }
 
   onSaveEditAll() {
