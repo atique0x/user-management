@@ -10,4 +10,5 @@ export interface User {
   role: UserRole;
   isActive: boolean;
   isInlineEdit?: boolean;
+  extraColumns?: { name: string; value: string }[];
 }

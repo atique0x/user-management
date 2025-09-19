@@ -4,7 +4,6 @@ import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 import { debounceTime, distinctUntilChanged, Subscription } from 'rxjs';
 
 import { User } from '../types/user.interface';
-import { ItemsPerPage } from '../types/item-per-page.enum';
 import { UserStatus } from '../types/user-status.type';
 import { UserRole } from '../types/user-role.enum';
 import { UsersService } from '../services/users.service';
@@ -20,7 +19,7 @@ export class DisplayUsersComponent implements OnInit, OnDestroy {
   users: User[] = [];
 
   currentPage = 1;
-  itemsPerPage: ItemsPerPage = ItemsPerPage.Ten;
+  itemsPerPage = 10;
   totalPages = 1;
 
   searchText: string = '';
@@ -35,7 +34,10 @@ export class DisplayUsersComponent implements OnInit, OnDestroy {
   editRowForm!: FormGroup<FromDataInterface>;
 
   editAll = false;
-  editAllForm!: FormGroup;
+  editAllForm!: FormGroup<{ users: FormArray<FormGroup<FromDataInterface>> }>;
+
+  addingColumnIndex: number | null = null;
+  addColumnForm!: FormGroup;
 
   constructor(
     private usersService: UsersService,
@@ -46,10 +48,6 @@ export class DisplayUsersComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.initSearchSubscription();
     this.initQueryParamsSubscription();
-  }
-
-  get usersFormArray(): FormArray {
-    return this.editAllForm.get('users') as FormArray;
   }
 
   // ---------------- Pagination & Filters ----------------
@@ -85,41 +83,10 @@ export class DisplayUsersComponent implements OnInit, OnDestroy {
     this.editingRowIndex = index;
     if (!userId) return;
     const user = this.usersService.getUserById(userId);
+    console.log(user);
     if (!user) return;
 
-    this.editRowForm = new FormGroup({
-      name: new FormControl(user.name, {
-        nonNullable: true,
-        validators: [Validators.required, Validators.minLength(3)],
-      }),
-      email: new FormControl(user.email, {
-        nonNullable: true,
-        validators: [
-          Validators.required,
-          Validators.email,
-          emailExistValidator(user.email),
-        ],
-      }),
-      phone: new FormControl(user.phone, {
-        nonNullable: true,
-        validators: [
-          Validators.required,
-          Validators.pattern('^01[346789][0-9]{8}$'),
-        ],
-      }),
-      dob: new FormControl(user.dob, {
-        nonNullable: true,
-        validators: [Validators.required],
-      }),
-      address: new FormControl(user.address, {
-        nonNullable: true,
-        validators: [Validators.required, Validators.minLength(3)],
-      }),
-      role: new FormControl(user.role, {
-        nonNullable: true,
-        validators: [Validators.required],
-      }),
-    });
+    this.editRowForm = this.createUserForm(user);
   }
 
   onInlineSave(userId?: string) {
@@ -128,7 +95,8 @@ export class DisplayUsersComponent implements OnInit, OnDestroy {
     const user = this.usersService.getUserById(userId);
     if (!user) return;
     const updatedUser = { ...user, ...this.editRowForm.value };
-    this.usersService.updateUser(updatedUser.id!, updatedUser);
+    console.log(updatedUser);
+    // this.usersService.updateUser(updatedUser.id!, updatedUser);
     this.editingRowIndex = null;
     this.loadUsers();
   }
@@ -137,26 +105,27 @@ export class DisplayUsersComponent implements OnInit, OnDestroy {
     this.editingRowIndex = null;
   }
 
-  /*
-  ----------------Bulk Edit -----------------
-  */
-
+  //----------------Bulk Edit -----------------
   onEditAll() {
     this.buildEditAllFrom();
     this.editAll = true;
   }
 
   onSaveEditAll() {
-    console.log(this.editAllForm.valid);
     if (!this.editAllForm.valid) return;
-
-    const updatedUsers = this.editAllForm.value.users;
-    console.log(updatedUsers);
-
-    updatedUsers.forEach((user: User) => {
+    const updatedUsers: User[] = [];
+    (this.editAllForm.get('users') as FormArray).controls.forEach(
+      (formGroup) => {
+        if (formGroup.dirty) {
+          const user: User = formGroup.value;
+          console.log();
+          updatedUsers.push(user);
+        }
+      }
+    );
+    updatedUsers.forEach((user) => {
       this.usersService.updateUser(user.id!, user);
     });
-
     this.editAll = false;
     this.loadUsers();
   }
@@ -165,7 +134,57 @@ export class DisplayUsersComponent implements OnInit, OnDestroy {
     this.editAll = false;
   }
 
-  onAddColumn(userId?: string) {}
+  //Add Extra Column
+  onAddColumn(index: number, userId?: string) {
+    if (!userId) return;
+    this.addingColumnIndex = index;
+    this.addColumnForm = new FormGroup({
+      name: new FormControl(''),
+      value: new FormControl(''),
+    });
+  }
+
+  onSaveColumn(userId?: string) {
+    if (!userId) return;
+    if (!this.addColumnForm.valid) return;
+
+    const { name, value } = this.addColumnForm.value;
+    const user = this.usersService.getUserById(userId);
+    if (!user) return;
+
+    const addColumnForm = this.createUserForm(user);
+    const extraColumns = addColumnForm.get('extraColumns') as FormArray;
+
+    extraColumns.push(
+      new FormGroup({
+        name: new FormControl<string>(name),
+        value: new FormControl<string>(value),
+      })
+    );
+
+    this.usersService.updateUser(userId, {
+      ...user,
+      extraColumns: [...(user.extraColumns || []), { name, value }],
+    });
+
+    this.addingColumnIndex = null;
+    this.loadUsers();
+  }
+
+  onCancelAddColumn() {
+    this.addingColumnIndex = null;
+  }
+
+  // Table row divide
+  getExtraColumnRows(user: any): any[][] {
+    const chunkSize = 7;
+    const columns = user.extraColumns || [];
+    const rows = [];
+    for (let i = 0; i < columns.length; i += chunkSize) {
+      rows.push(columns.slice(i, i + chunkSize));
+    }
+    return rows;
+  }
 
   /*
   ---------------- User Actions ----------------
@@ -262,51 +281,66 @@ export class DisplayUsersComponent implements OnInit, OnDestroy {
   }
 
   private buildEditAllFrom() {
-    const usersGroup = this.users.map(
-      (user) =>
-        new FormGroup({
-          id: new FormControl(user.id),
-          name: new FormControl(user.name, {
-            nonNullable: true,
-            validators: [Validators.required, Validators.minLength(3)],
-          }),
-          email: new FormControl(user.email, {
-            nonNullable: true,
-            validators: [
-              Validators.required,
-              Validators.email,
-              emailExistValidator(user.email),
-            ],
-          }),
-          phone: new FormControl(user.phone, {
-            nonNullable: true,
-            validators: [
-              Validators.required,
-              Validators.pattern('^01[346789][0-9]{8}$'),
-            ],
-          }),
-          dob: new FormControl(user.dob, {
-            nonNullable: true,
-            validators: [Validators.required],
-          }),
-          address: new FormControl(user.address, {
-            nonNullable: true,
-            validators: [Validators.required, Validators.minLength(3)],
-          }),
-          status: new FormControl(user.isActive, {
-            nonNullable: true,
-            validators: [Validators.required, Validators.minLength(3)],
-          }),
-          role: new FormControl(user.role, {
-            nonNullable: true,
-            validators: [Validators.required],
-          }),
-        })
-    );
-
+    const usersGroup = this.users.map((user) => this.createUserForm(user));
     this.editAllForm = new FormGroup({
       users: new FormArray(usersGroup),
     });
+  }
+
+  private createUserForm(user: User): FormGroup {
+    const extraColumnsFormArray = new FormArray(
+      (user.extraColumns || []).map(
+        (col) =>
+          new FormGroup({
+            name: new FormControl(col.name, Validators.required),
+            value: new FormControl(col.value, Validators.required),
+          })
+      )
+    );
+
+    return new FormGroup({
+      id: new FormControl(user.id),
+      name: new FormControl(user.name, {
+        nonNullable: true,
+        validators: [Validators.required, Validators.minLength(3)],
+      }),
+      email: new FormControl(user.email, {
+        nonNullable: true,
+        validators: [
+          Validators.required,
+          Validators.email,
+          emailExistValidator(user.email),
+        ],
+      }),
+      phone: new FormControl(user.phone, {
+        nonNullable: true,
+        validators: [
+          Validators.required,
+          Validators.pattern('^01[346789][0-9]{8}$'),
+        ],
+      }),
+      dob: new FormControl(user.dob, {
+        nonNullable: true,
+        validators: [Validators.required],
+      }),
+      address: new FormControl(user.address, {
+        nonNullable: true,
+        validators: [Validators.required, Validators.minLength(3)],
+      }),
+      status: new FormControl(user.isActive, {
+        nonNullable: true,
+        validators: [Validators.required, Validators.minLength(3)],
+      }),
+      role: new FormControl(user.role, {
+        nonNullable: true,
+        validators: [Validators.required],
+      }),
+      extraColumns: extraColumnsFormArray,
+    });
+  }
+
+  get usersFormArray(): FormArray {
+    return this.editAllForm.get('users') as FormArray;
   }
 
   ngOnDestroy(): void {

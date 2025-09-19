@@ -169,50 +169,46 @@
       <tbody>
         <!-- Normal Mode -->
         <ng-container *ngIf="!editAll">
-          <tr
-            *ngFor="let user of users; let i = index"
-            class="border-b hover:bg-gray-50 transition duration-150"
-          >
-            <!-- Inline Edit Row -->
-            <ng-container
-              *ngIf="editingRowIndex === i; else viewRow"
+          <ng-container *ngFor="let user of users; let i = index">
+            <!-- Inline Edit Fields -->
+            <tr
+              *ngIf="editingRowIndex === i"
               [formGroup]="editRowForm"
+              class="border-b hover:bg-gray-50 transition"
             >
-              <td class="py-3 px-4 font-medium text-gray-800">
-                {{ i + 1 + (currentPage - 1) * itemsPerPage }}
-              </td>
-              <td class="py-3 px-4">
+              <td>{{ i + 1 + (currentPage - 1) * itemsPerPage }}</td>
+              <td>
                 <input
                   formControlName="name"
                   class="w-full border rounded px-2 py-1"
                 />
               </td>
-              <td class="py-3 px-4">
+              <td>
                 <input
                   formControlName="email"
                   class="w-full border rounded px-2 py-1"
                 />
               </td>
-              <td class="py-3 px-4">
+              <td>
                 <input
                   formControlName="phone"
                   class="w-full border rounded px-2 py-1"
                 />
               </td>
-              <td class="py-3 px-4">
+              <td>
                 <input
                   type="date"
                   formControlName="dob"
                   class="w-full border rounded px-2 py-1"
                 />
               </td>
-              <td class="py-3 px-4">
+              <td>
                 <input
                   formControlName="address"
                   class="w-full border rounded px-2 py-1"
                 />
               </td>
-              <td class="py-3 px-4 text-center">
+              <td class="text-center">
                 <span
                   class="px-4 py-1 text-xs font-semibold rounded-full"
                   [ngClass]="
@@ -224,7 +220,7 @@
                   {{ user.isActive ? "Active" : "Inactive" }}
                 </span>
               </td>
-              <td class="py-3 px-4">
+              <td>
                 <select
                   formControlName="role"
                   class="border rounded px-2 py-1 w-full"
@@ -234,35 +230,35 @@
                   </option>
                 </select>
               </td>
-              <td class="py-3 px-4 text-center flex gap-2 justify-center">
+
+              <td class="text-center flex gap-2 justify-center">
                 <button
                   (click)="onInlineSave(user.id)"
-                  class="px-3 py-1 bg-blue-500 text-white text-xs rounded-lg shadow hover:bg-blue-600 transition"
+                  class="px-3 py-1 bg-blue-500 text-white text-xs rounded-lg"
                 >
                   Save
                 </button>
                 <button
                   (click)="onInlineCancel()"
-                  class="px-3 py-1 bg-gray-300 text-gray-800 text-xs rounded-lg shadow hover:bg-gray-400 transition"
+                  class="px-3 py-1 bg-gray-300 text-gray-800 text-xs rounded-lg"
                 >
                   Cancel
                 </button>
               </td>
-            </ng-container>
+            </tr>
 
-            <!-- View Row -->
-            <ng-template #viewRow>
-              <td class="py-3 px-4 font-medium text-gray-800">
-                {{ i + 1 + (currentPage - 1) * itemsPerPage }}
-              </td>
-              <td class="py-3 px-4 font-medium text-gray-800">
-                {{ user.name }}
-              </td>
-              <td class="py-3 px-4 text-gray-600">{{ user.email }}</td>
-              <td class="py-3 px-4 text-gray-600">{{ user.phone }}</td>
-              <td class="py-3 px-4">{{ user.dob | date }}</td>
-              <td class="py-3 px-4">{{ user.address | titlecase }}</td>
-              <td class="py-3 px-4 text-center">
+            <!-- Normal View Row -->
+            <tr
+              *ngIf="editingRowIndex !== i"
+              class="border-b hover:bg-gray-50 transition"
+            >
+              <td>{{ i + 1 + (currentPage - 1) * itemsPerPage }}</td>
+              <td>{{ user.name }}</td>
+              <td>{{ user.email }}</td>
+              <td>{{ user.phone }}</td>
+              <td>{{ user.dob | date }}</td>
+              <td>{{ user.address | titlecase }}</td>
+              <td class="text-center">
                 <span
                   class="px-4 py-1 text-xs font-semibold rounded-full"
                   [ngClass]="
@@ -274,53 +270,97 @@
                   {{ user.isActive ? "Active" : "Inactive" }}
                 </span>
               </td>
-              <td class="py-3 px-4">{{ user.role | titlecase }}</td>
-              <td class="py-3 px-4 text-center flex gap-2">
-                <div *ngIf="user.isActive" class="flex gap-2 justify-center">
-                  <button
-                    (click)="onInlineEdit(i, user.id)"
-                    class="px-3 py-1 bg-blue-500 text-white text-xs rounded-lg shadow hover:bg-blue-600 transition"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    (click)="onUpdateUser(user.id)"
-                    class="px-3 py-1 bg-blue-500 text-white text-xs rounded-lg shadow hover:bg-blue-600 transition"
-                  >
-                    Update
-                  </button>
-                  <button
-                    (click)="onToggleActiveStatus(user.id)"
-                    class="px-4 py-1 bg-red-500 text-white text-xs rounded-lg shadow hover:bg-red-600 transition"
-                  >
-                    Inactivate
-                  </button>
-                </div>
-                <div *ngIf="!user.isActive" class="flex gap-2 justify-center">
-                  <button
-                    (click)="onDeleteUser(user.id)"
-                    class="px-4 py-1 bg-red-500 text-white text-xs rounded-lg shadow hover:bg-red-600 transition"
-                  >
-                    Delete
-                  </button>
-                  <button
-                    (click)="onToggleActiveStatus(user.id)"
-                    class="px-4 py-1 bg-green-500 text-white text-xs rounded-lg shadow hover:bg-green-600 transition"
-                  >
-                    Reactivate
-                  </button>
-                </div>
-                <div>
-                  <button
-                    (click)="onAddColumn(user.id)"
-                    class="px-4 py-2 bg-green-500 text-white text-xs rounded-lg shadow hover:bg-green-600 transition"
-                  >
-                    Add Column
-                  </button>
-                </div>
+              <td>{{ user.role | titlecase }}</td>
+              <td class="text-center flex gap-2">
+                <button
+                  (click)="onInlineEdit(i, user.id)"
+                  class="px-3 py-1 bg-blue-500 text-white text-xs rounded-lg"
+                >
+                  Edit
+                </button>
+                <button
+                  (click)="onUpdateUser(user.id)"
+                  class="px-3 py-1 bg-blue-500 text-white text-xs rounded-lg"
+                >
+                  Update
+                </button>
+                <button
+                  *ngIf="user.isActive"
+                  (click)="onToggleActiveStatus(user.id)"
+                  class="px-4 py-1 bg-red-500 text-white text-xs rounded-lg"
+                >
+                  Inactivate
+                </button>
+                <button
+                  *ngIf="!user.isActive"
+                  (click)="onToggleActiveStatus(user.id)"
+                  class="px-4 py-1 bg-green-500 text-white text-xs rounded-lg"
+                >
+                  Reactivate
+                </button>
+                <button
+                  (click)="onAddColumn(i, user.id)"
+                  class="px-4 py-2 bg-green-500 text-white text-xs rounded-lg"
+                >
+                  Add Column
+                </button>
               </td>
-            </ng-template>
-          </tr>
+            </tr>
+
+            <!-- Extra Columns & Add Column Form -->
+            <ng-container
+              *ngIf="user.extraColumns?.length && editingRowIndex !== i"
+            >
+              <ng-container *ngFor="let row of getExtraColumnRows(user)">
+                <tr class="border">
+                  <td></td>
+                  <td *ngFor="let col of row">
+                    <div class="flex flex-col gap-1">
+                      <span class="text-sm font-medium">{{ col.name }}:</span>
+                      <span class="text-gray-600">{{ col.value }}</span>
+                    </div>
+                  </td>
+                  <td></td>
+                </tr>
+              </ng-container>
+            </ng-container>
+
+            <tr *ngIf="addingColumnIndex === i" [formGroup]="addColumnForm">
+              <td></td>
+              <td colspan="3">
+                <input
+                  type="text"
+                  placeholder="Column"
+                  formControlName="name"
+                  class="border p-1 rounded w-full"
+                />
+              </td>
+              <td colspan="3">
+                <input
+                  type="text"
+                  placeholder="Value"
+                  formControlName="value"
+                  class="border p-1 rounded w-full"
+                />
+              </td>
+              <td>
+                <button
+                  (click)="onSaveColumn(user.id)"
+                  class="bg-blue-500 text-white px-3 py-1 rounded"
+                >
+                  Save
+                </button>
+              </td>
+              <td>
+                <button
+                  (click)="onCancelAddColumn()"
+                  class="bg-gray-400 text-white px-3 py-1 rounded"
+                >
+                  Cancel
+                </button>
+              </td>
+            </tr>
+          </ng-container>
         </ng-container>
 
         <!-- Edit All Mode -->
