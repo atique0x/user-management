@@ -236,7 +236,7 @@
               </td>
               <td class="py-3 px-4 text-center flex gap-2 justify-center">
                 <button
-                  (click)="onInlineSave(i)"
+                  (click)="onInlineSave(user.id)"
                   class="px-3 py-1 bg-blue-500 text-white text-xs rounded-lg shadow hover:bg-blue-600 transition"
                 >
                   Save
@@ -275,10 +275,10 @@
                 </span>
               </td>
               <td class="py-3 px-4">{{ user.role | titlecase }}</td>
-              <td class="py-3 px-4 text-center">
+              <td class="py-3 px-4 text-center flex gap-2">
                 <div *ngIf="user.isActive" class="flex gap-2 justify-center">
                   <button
-                    (click)="onInlineEdit(i)"
+                    (click)="onInlineEdit(i, user.id)"
                     class="px-3 py-1 bg-blue-500 text-white text-xs rounded-lg shadow hover:bg-blue-600 transition"
                   >
                     Edit
@@ -308,6 +308,14 @@
                     class="px-4 py-1 bg-green-500 text-white text-xs rounded-lg shadow hover:bg-green-600 transition"
                   >
                     Reactivate
+                  </button>
+                </div>
+                <div>
+                  <button
+                    (click)="onAddColumn(user.id)"
+                    class="px-4 py-2 bg-green-500 text-white text-xs rounded-lg shadow hover:bg-green-600 transition"
+                  >
+                    Add Column
                   </button>
                 </div>
               </td>

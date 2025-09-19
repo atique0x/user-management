@@ -81,9 +81,11 @@ export class DisplayUsersComponent implements OnInit, OnDestroy {
   /*
    ---------------- Inline Edit ----------------
   */
-  onInlineEdit(index: number) {
+  onInlineEdit(index: number, userId?: string) {
     this.editingRowIndex = index;
-    const user = this.users[index];
+    if (!userId) return;
+    const user = this.usersService.getUserById(userId);
+    if (!user) return;
 
     this.editRowForm = new FormGroup({
       name: new FormControl(user.name, {
@@ -120,9 +122,11 @@ export class DisplayUsersComponent implements OnInit, OnDestroy {
     });
   }
 
-  onInlineSave(index: number) {
+  onInlineSave(userId?: string) {
     if (!this.editRowForm.valid) return;
-    const user = this.users[index];
+    if (!userId) return;
+    const user = this.usersService.getUserById(userId);
+    if (!user) return;
     const updatedUser = { ...user, ...this.editRowForm.value };
     this.usersService.updateUser(updatedUser.id!, updatedUser);
     this.editingRowIndex = null;
@@ -160,6 +164,8 @@ export class DisplayUsersComponent implements OnInit, OnDestroy {
   onCancelEditAll() {
     this.editAll = false;
   }
+
+  onAddColumn(userId?: string) {}
 
   /*
   ---------------- User Actions ----------------
