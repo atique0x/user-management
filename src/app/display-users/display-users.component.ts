@@ -81,9 +81,9 @@ export class DisplayUsersComponent implements OnInit, OnDestroy {
   */
   onInlineEdit(index: number, userId?: string) {
     this.editingRowIndex = index;
+    this.addingColumnIndex = null;
     if (!userId) return;
     const user = this.usersService.getUserById(userId);
-    console.log(user);
     if (!user) return;
 
     this.editRowForm = this.createUserForm(user);
@@ -94,9 +94,16 @@ export class DisplayUsersComponent implements OnInit, OnDestroy {
     if (!userId) return;
     const user = this.usersService.getUserById(userId);
     if (!user) return;
-    const updatedUser = { ...user, ...this.editRowForm.value };
-    console.log(updatedUser);
-    // this.usersService.updateUser(updatedUser.id!, updatedUser);
+
+    const updatedUser: User = {
+      ...user,
+      ...this.editRowForm.value,
+      extraColumns: this.editRowForm.value.extraColumns as {
+        name: string;
+        value: string;
+      }[],
+    };
+    this.usersService.updateUser(updatedUser.id!, updatedUser);
     this.editingRowIndex = null;
     this.loadUsers();
   }
@@ -136,6 +143,7 @@ export class DisplayUsersComponent implements OnInit, OnDestroy {
 
   //Add Extra Column
   onAddColumn(index: number, userId?: string) {
+    this.editingRowIndex = null;
     if (!userId) return;
     this.addingColumnIndex = index;
     this.addColumnForm = new FormGroup({
@@ -341,6 +349,10 @@ export class DisplayUsersComponent implements OnInit, OnDestroy {
 
   get usersFormArray(): FormArray {
     return this.editAllForm.get('users') as FormArray;
+  }
+
+  onNameChange(name: Event) {
+    console.log(name);
   }
 
   ngOnDestroy(): void {
