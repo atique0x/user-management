@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { UsersService } from '../users.service';
 import { UserInterface } from '../types/user.interface';
 import { ActivatedRoute, Router } from '@angular/router';
+import { emailExistValidator } from '../validators/email-exist-validator';
 
 @Component({
   selector: 'app-user-form',
@@ -84,7 +85,11 @@ export class UserFormComponent implements OnInit {
       }),
       email: new FormControl(user.email, {
         nonNullable: true,
-        validators: [Validators.required, Validators.email],
+        validators: [
+          Validators.required,
+          Validators.email,
+          emailExistValidator(user.email),
+        ],
       }),
       phone: new FormControl(user.phone, {
         nonNullable: true,

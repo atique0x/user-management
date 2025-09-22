@@ -16,6 +16,7 @@ import {
 } from 'src/app/types/form-data.interface';
 import { ActivatedRoute, Params } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { emailExistValidator } from 'src/app/validators/email-exist-validator';
 
 @Component({
   selector: 'app-users-display-table',
@@ -94,6 +95,24 @@ export class UsersDisplayTableComponent implements OnInit {
 
   onCancelColumn(row: number) {
     this.addColumn[row] = false;
+  }
+
+  removeAdditional(row: number, itemIndex: number) {
+    const additionalFields = this.userFormArray
+      .at(row)
+      .get('additional') as FormArray;
+    const userId = this.userFormArray.at(row).value.id!;
+
+    if (itemIndex >= 0 && itemIndex < additionalFields.length) {
+      additionalFields.removeAt(itemIndex);
+
+      const updatedAdditional = additionalFields.value;
+
+      this.userBulkFieldUpdate.emit({
+        id: userId,
+        updatedData: { additional: updatedAdditional },
+      });
+    }
   }
 
   //--------------- User Actions ------------------
@@ -242,7 +261,11 @@ export class UsersDisplayTableComponent implements OnInit {
           }),
           email: new FormControl(user.email, {
             nonNullable: true,
-            validators: [Validators.required, Validators.email],
+            validators: [
+              Validators.required,
+              Validators.email,
+              emailExistValidator(user.email),
+            ],
           }),
           phone: new FormControl(user.phone, {
             nonNullable: true,

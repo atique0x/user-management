@@ -72,7 +72,9 @@
             </p>
           </ng-container>
           <ng-template #viewName>
-            <span (click)="onEditField(i, 'name')">{{ user.value.name }}</span>
+            <span (dblclick)="onEditField(i, 'name')">{{
+              user.value.name
+            }}</span>
           </ng-template>
         </td>
 
@@ -119,7 +121,7 @@
             </p>
           </ng-container>
           <ng-template #viewEmail>
-            <span (click)="onEditField(i, 'email')">{{
+            <span (dblclick)="onEditField(i, 'email')">{{
               user.value.email
             }}</span>
           </ng-template>
@@ -165,7 +167,7 @@
             </p>
           </ng-container>
           <ng-template #viewPhone>
-            <span (click)="onEditField(i, 'phone')">{{
+            <span (dblclick)="onEditField(i, 'phone')">{{
               user.value.phone
             }}</span>
           </ng-template>
@@ -207,7 +209,7 @@
           </ng-container>
 
           <ng-template #viewDOB>
-            <span (click)="onEditField(i, 'dob')">{{
+            <span (dblclick)="onEditField(i, 'dob')">{{
               user.value.dob | date
             }}</span>
           </ng-template>
@@ -256,7 +258,7 @@
           </ng-container>
 
           <ng-template #viewAddress>
-            <span (click)="onEditField(i, 'address')">{{
+            <span (dblclick)="onEditField(i, 'address')">{{
               user.value.address
             }}</span>
           </ng-template>
@@ -293,7 +295,7 @@
             </span>
           </ng-container>
           <ng-template #viewRole>
-            <span (click)="onEditField(i, 'role')">{{
+            <span (dblclick)="onEditField(i, 'role')">{{
               user.value.role | titlecase
             }}</span>
           </ng-template>
@@ -384,7 +386,12 @@
       <ng-container *ngIf="user.controls.additional?.controls">
         <tr>
           <td></td>
-          <td *ngFor="let item of user.controls.additional?.controls">
+          <td
+            *ngFor="
+              let item of user.controls.additional?.controls;
+              let j = index
+            "
+          >
             <ng-container
               *ngIf="
                 editingRowIndex[i] ||
@@ -395,6 +402,7 @@
             >
               <input [formControl]="getControl(item, 'key')" />
               <input [formControl]="getControl(item, 'value')" />
+              <button (click)="removeAdditional(i, j)">Remove</button>
             </ng-container>
             <ng-template #viewAdditional>
               <span>
