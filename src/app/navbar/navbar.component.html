@@ -1,37 +1,31 @@
-<nav class="bg-gray-800 shadow-lg">
-  <div class="container mx-auto px-6">
-    <div class="flex items-center justify-between h-20">
-      <!-- Logo / Brand -->
-      <div class="flex-shrink-0">
-        <a
-          href="/"
-          class="text-white text-xl font-semibold hover:text-gray-300 transition-colors duration-200"
-        >
-          MyApp
-        </a>
+<nav class="navbar">
+  <div class="container">
+    <div class="nav-content">
+      <div class="logo">
+        <a routerLink="/">MyApp</a>
       </div>
 
-      <!-- Navigation Links -->
-      <ul class="flex space-x-6">
+      <ul class="nav-links">
         <li>
           <a
             routerLink="/display-user"
-            routerLinkActive="text-white border-b-2 border-white font-bold"
-            class="text-gray-300 hover:text-white transition-colors duration-200 pb-1"
+            routerLinkActive="active"
+            class="nav-link"
+            [routerLinkActiveOptions]="{ exact: true }"
           >
             Display User
           </a>
         </li>
-        <li>
+        <!-- <li>
           <a
             routerLink="/add-user"
-            routerLinkActive="text-white border-b-2 border-white font-bold"
+            routerLinkActive="active"
+            class="nav-link"
             [routerLinkActiveOptions]="{ exact: true }"
-            class="text-gray-300 hover:text-white transition-colors duration-200 pb-1"
           >
             Add User
           </a>
-        </li>
+        </li> -->
       </ul>
     </div>
   </div>

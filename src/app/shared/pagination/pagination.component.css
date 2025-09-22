@@ -1,10 +1,46 @@
-button:disabled {
-  opacity: 0.5; /* faded look */
-  cursor: not-allowed; /* indicate disabled */
-  background-color: #f3f4f6; /* light gray */
-  color: #6b7280; /* gray text */
+/* Pagination container */
+div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin: 20px 0;
+  font-family: Arial, sans-serif;
 }
 
+/* Pagination buttons */
+button {
+  min-width: 40px;
+  padding: 8px 14px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fff;
+  color: #333;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+/* Hover effect */
 button:hover:not(:disabled) {
-  transition: background-color 0.2s ease-in-out;
+  background: #f0f0f0;
+  border-color: #bbb;
+}
+
+/* Active page button */
+button.active {
+  background: #007bff;
+  color: #fff;
+  border-color: #007bff;
+  cursor: default;
+}
+
+/* Disabled buttons */
+button:disabled {
+  background: #f8f8f8;
+  color: #aaa;
+  border-color: #eee;
+  cursor: not-allowed;
+  opacity: 0.6;
 }

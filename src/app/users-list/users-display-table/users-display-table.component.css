@@ -1,0 +1,241 @@
+/* ================= Bulk Buttons ================= */
+.bulk-buttons {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.bulk-buttons button {
+  padding: 8px 18px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* ================= Button Colors ================= */
+button.edit {
+  background-color: #3b82f6;
+  color: white;
+}
+button.edit:hover:not(:disabled) {
+  background-color: #2563eb;
+}
+
+button.save {
+  background-color: #16a34a;
+  color: white;
+}
+button.save:hover:not(:disabled) {
+  background-color: #15803d;
+}
+
+button.cancel {
+  background-color: #df3e3e;
+  color: white;
+}
+button.cancel:hover:not(:disabled) {
+  background-color: #c53030;
+}
+
+button.danger {
+  background-color: #df3e3e;
+  color: white;
+}
+button.danger:hover:not(:disabled) {
+  background-color: #c53030;
+}
+
+button.success {
+  background-color: #22c55e;
+  color: white;
+}
+button.success:hover:not(:disabled) {
+  background-color: #16a34a;
+}
+
+button.add-column {
+  padding: 6px 12px;
+  background-color: #1494c6;
+  color: white;
+}
+button.add-column:hover {
+  background-color: #117ca7;
+}
+
+/* ================= Table Styling ================= */
+table {
+  width: 100%;
+  border-collapse: collapse; /* ✅ colspan ঠিকমতো কাজ করবে */
+  table-layout: auto; /* ✅ auto রাখা জরুরি */
+  font-family: "Arial", sans-serif;
+  background: #ffffff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+thead {
+  background: #f3f4f6;
+}
+
+thead th {
+  text-align: left;
+  padding: 14px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+tbody tr {
+  border-bottom: 1px solid #e5e7eb;
+  transition: background 0.2s ease;
+}
+
+tbody tr:hover {
+  background: #f9fafb;
+}
+
+tbody td {
+  padding: 12px 14px;
+  font-size: 14px;
+  color: #374151;
+  vertical-align: middle;
+}
+
+/* ================= Input Fields ================= */
+tbody input[type="text"],
+tbody select,
+tbody input[type="date"] {
+  width: 100%;
+  padding: 6px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 5px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+tbody input[type="text"]:focus,
+tbody select:focus,
+tbody input[type="date"]:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+}
+
+/* ================= Row Action Buttons ================= */
+.action-btn {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.action-btn button,
+.inline-add button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 5px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  color: white;
+}
+
+/* ================= Disabled Buttons ================= */
+button:disabled,
+.bulk-buttons button:disabled,
+tbody td:last-child button:disabled {
+  background-color: #9ca3af;
+  color: #ffffff;
+  cursor: not-allowed;
+  opacity: 0.65;
+  pointer-events: none;
+}
+
+/* ================= Validation Messages ================= */
+.error {
+  font-size: 12px;
+  color: #dc2626;
+  margin-top: 4px;
+}
+
+.error span {
+  display: block;
+  line-height: 1.2;
+}
+
+/* ================= Highlight Invalid Input ================= */
+input.ng-invalid.ng-touched,
+select.ng-invalid.ng-touched {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.15);
+}
+
+/* ================= Editable Field Save/Cancel Buttons ================= */
+tbody span button {
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+.gap-button {
+  display: flex;
+  gap: 6px;
+}
+
+.no-users-cell {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+  text-align: center;
+}
+
+.no-users-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  row-gap: 0.5rem;
+  color: #6b7280;
+}
+
+.no-users-icon {
+  height: 3rem;
+  width: 3rem;
+  color: #d1d5db;
+}
+
+.no-users-title {
+  font-size: 1.125rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+.no-users-subtitle {
+  font-size: 0.875rem;
+  color: #9ca3af;
+  margin: 0;
+}
+
+/* ================= Inline Add Row ================= */
+.inline-add td {
+  background: #fafafa;
+  justify-items: center;
+}
+
+.inline-add td div {
+  display: flex;
+  gap: 8px;
+  border-radius: 6px;
+  width: 90%;
+}
+
+/* ================= Inline Add Inputs ================= */
+tr.inline-add td span input[type="text"] {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.2s ease;
+}

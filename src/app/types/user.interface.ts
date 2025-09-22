@@ -1,14 +1,14 @@
-import { UserRole } from './user-role.enum';
+import { StatusType } from './status.type';
+import { UserRoleEnum } from './user-role.enum';
 
-export interface User {
-  id?: string;
+export interface UserInterface {
+  id: string;
   name: string;
   email: string;
   phone: string;
   dob: string;
   address: string;
-  role: UserRole;
-  isActive: boolean;
-  isInlineEdit?: boolean;
-  extraColumns?: { name: string; value: string }[];
+  role: UserRoleEnum;
+  status: StatusType;
+  additional?: { key: string; value: string }[];
 }

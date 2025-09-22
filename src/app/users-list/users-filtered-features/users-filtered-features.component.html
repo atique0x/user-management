@@ -1,0 +1,68 @@
+<section>
+  <div>
+    <!-- Add & Edit Buttons -->
+    <div>
+      <button (click)="onAddUser()">Add User</button>
+    </div>
+
+    <!-- Status Filter -->
+    <div>
+      <span>Status:</span>
+      <label>
+        <input
+          type="radio"
+          name="statusFilter"
+          [value]="true"
+          [(ngModel)]="statusFilter"
+          (change)="onStatusFilterChange()"
+        />
+        Active
+      </label>
+      <label>
+        <input
+          type="radio"
+          name="statusFilter"
+          [value]="false"
+          [(ngModel)]="statusFilter"
+          (change)="onStatusFilterChange()"
+        />
+        Inactive
+      </label>
+    </div>
+
+    <!-- Role Filter -->
+    <div>
+      <label for="roleFilter">Role:</label>
+      <select (change)="onRoleFilterChange()" [(ngModel)]="roleFilter">
+        <option value="default">Default</option>
+        <option *ngFor="let role of roles" [value]="role">
+          {{ role | titlecase }}
+        </option>
+      </select>
+    </div>
+
+    <!-- Items Per Page -->
+    <div>
+      <label for="itemsPerPage">Show:</label>
+      <select
+        [(ngModel)]="itemsPerPageFilter"
+        (change)="onItemsPerPageFilterChange()"
+      >
+        <option [value]="number" *ngFor="let number of [5, 10, 15, 20]">
+          {{ number }}
+        </option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Search -->
+  <div>
+    <div>
+      <input
+        type="text"
+        placeholder="Search by name, email, or phone..."
+        [formControl]="searchControl"
+      />
+    </div>
+  </div>
+</section>

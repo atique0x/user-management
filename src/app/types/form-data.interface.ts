@@ -1,19 +1,20 @@
-import { FormControl, FormGroup, FormArray } from '@angular/forms';
-import { UserRole } from './user-role.enum';
+import { FormArray, FormControl, FormGroup } from '@angular/forms';
+import { UserRoleEnum } from './user-role.enum';
+import { StatusType } from './status.type';
 
-export interface ExtraColumnFormInterface {
-  name: FormControl<string>;
-  value: FormControl<string>;
-}
-
-export interface FromDataInterface {
-  id?: FormControl<string>;
+export interface UserFromDataInterface {
+  id: FormControl<string>;
   name: FormControl<string>;
   email: FormControl<string>;
   phone: FormControl<string>;
   dob: FormControl<string>;
   address: FormControl<string>;
-  role: FormControl<UserRole>;
-  isActive?: FormControl<boolean>;
-  extraColumns?: FormArray<FormGroup<ExtraColumnFormInterface>>;
+  role: FormControl<UserRoleEnum>;
+  status: FormControl<StatusType>;
+  additional?: FormArray<FormGroup<AdditionalFormDataInterFace>>;
+}
+
+export interface AdditionalFormDataInterFace {
+  key: FormControl<string>;
+  value: FormControl<string>;
 }

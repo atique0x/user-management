@@ -1,0 +1,55 @@
+/* CSS */
+.navbar {
+  background-color: #1f2937; /* gray-800 */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.nav-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 80px;
+}
+
+.logo a {
+  color: white;
+  font-size: 1.25rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.logo a:hover {
+  color: #d1d5db;
+}
+
+.nav-links {
+  display: flex;
+  gap: 1.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-link {
+  color: #d1d5db;
+  text-decoration: none;
+  padding-bottom: 0.25rem;
+  transition: color 0.2s;
+}
+
+.nav-link:hover {
+  color: white;
+}
+
+/* Angular routerLinkActive styling */
+.nav-link.active {
+  color: white;
+  font-weight: bold;
+  border-bottom: 2px solid white;
+}

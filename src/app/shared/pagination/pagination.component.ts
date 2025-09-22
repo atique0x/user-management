@@ -9,7 +9,7 @@ export class PaginationComponent {
   @Input() currentPage = 1;
   @Input() itemsPerPage = 10;
   @Input() totalPages = 1;
-  @Input() disabled = false;
+
   @Output() pageChange = new EventEmitter<number>();
 
   goPreviousPage(): void {

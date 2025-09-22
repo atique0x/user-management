@@ -1,0 +1,21 @@
+<app-users-filtered-features
+  (statusFilterChanged)="handleStatusChange($event)"
+  (roleFilterChanged)="handleRoleChange($event)"
+  (itemPerPageFilterChanged)="handleItemsPerPageChange($event)"
+  (searchChanged)="handleSearchChange($event)"
+></app-users-filtered-features>
+
+<app-users-display-table
+  [users]="users"
+  (userDeleted)="handleUserDelete($event)"
+  (userToggleStatus)="handleToggleStatus($event)"
+  (userUpdated)="handleUpdateUser($event)"
+  (userBulkFieldUpdate)="handleBulkFieldUpdate($event)"
+></app-users-display-table>
+
+<app-pagination
+  [currentPage]="currentPage"
+  [totalPages]="totalPages"
+  [itemsPerPage]="itemsPerPage"
+  (pageChange)="onPageChange($event)"
+></app-pagination>
