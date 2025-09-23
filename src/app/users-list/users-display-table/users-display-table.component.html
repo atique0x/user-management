@@ -29,7 +29,7 @@
       *ngFor="let user of userFormArray.controls; let i = index"
       [formGroupName]="i"
     >
-      <tr>
+      <tr class="border-top-row">
         <!-- Index -->
         <td>{{ i + 1 + (currentPage - 1) * itemsPerPage }}</td>
 
