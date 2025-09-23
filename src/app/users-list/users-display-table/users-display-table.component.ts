@@ -184,7 +184,7 @@ export class UsersDisplayTableComponent
     }
   }
 
-  //----------------- Add Column ------------------
+  //-------------- Add new column --------------
   onAddColumn(row: number) {
     this.addColumn[row] = true;
     this.addColumnForm[row] = new FormGroup({
@@ -207,6 +207,11 @@ export class UsersDisplayTableComponent
         value: new FormControl(newField.value, { nonNullable: true }),
       })
     );
+    const userId = this.userFormArray.at(row).value.id!;
+    this.userBulkFieldUpdate.emit({
+      id: userId,
+      updatedData: { additional: additionalFields.value },
+    });
     this.addColumn[row] = false;
   }
 
@@ -214,6 +219,7 @@ export class UsersDisplayTableComponent
     this.addColumn[row] = false;
   }
 
+  //------------- Remove additional data ------------
   removeAdditional(row: number, itemIndex: number) {
     const additionalFields = this.userFormArray
       .at(row)
@@ -222,9 +228,7 @@ export class UsersDisplayTableComponent
 
     if (itemIndex >= 0 && itemIndex < additionalFields.length) {
       additionalFields.removeAt(itemIndex);
-
       const updatedAdditional = additionalFields.value;
-
       this.userBulkFieldUpdate.emit({
         id: userId,
         updatedData: { additional: updatedAdditional },
