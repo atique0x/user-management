@@ -49,6 +49,7 @@ export class UsersDisplayTableComponent
 
   currentPage = 1;
   itemsPerPage = 10;
+  arr: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
   private queryParamsSub?: Subscription;
 
@@ -221,6 +222,7 @@ export class UsersDisplayTableComponent
 
   //------------- Remove additional data ------------
   removeAdditional(row: number, itemIndex: number) {
+    console.log(row, itemIndex);
     const additionalFields = this.userFormArray
       .at(row)
       .get('additional') as FormArray;
@@ -234,6 +236,19 @@ export class UsersDisplayTableComponent
         updatedData: { additional: updatedAdditional },
       });
     }
+  }
+
+  //--------------- Chunk Array Data ----------------
+  chunkArray(
+    arr: FormGroup<AdditionalFormDataInterFace>[] | undefined,
+    chunckSize: number
+  ): FormGroup<AdditionalFormDataInterFace>[][] | [] {
+    if (!arr) return [];
+    const newArr: FormGroup<AdditionalFormDataInterFace>[][] = [];
+    for (let i = 0; i < arr.length; i += chunckSize) {
+      newArr.push(arr.slice(i, i + chunckSize));
+    }
+    return newArr;
   }
 
   private getUpdatedData(

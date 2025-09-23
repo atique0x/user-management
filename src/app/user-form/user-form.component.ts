@@ -1,11 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
-import { UserFromDataInterface } from '../types/form-data.interface';
-import { UserRoleEnum } from '../types/user-role.enum';
-import { v4 as uuidv4 } from 'uuid';
-import { UsersService } from '../users.service';
-import { UserInterface } from '../types/user.interface';
 import { ActivatedRoute, Router } from '@angular/router';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { Location } from '@angular/common';
+import { v4 as uuidv4 } from 'uuid';
+
+import { UserInterface } from '../types/user.interface';
+import { UserRoleEnum } from '../types/user-role.enum';
+import { UserFromDataInterface } from '../types/form-data.interface';
+import { UsersService } from '../users.service';
 import { emailExistValidator } from '../validators/email-exist-validator';
 
 @Component({
@@ -25,7 +27,8 @@ export class UserFormComponent implements OnInit {
   constructor(
     private userService: UsersService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private location: Location
   ) {}
 
   ngOnInit(): void {
@@ -61,6 +64,10 @@ export class UserFormComponent implements OnInit {
       this.formReset();
       alert('✅ User added successfully!');
     }
+  }
+
+  cancelAddUser() {
+    this.location.back();
   }
 
   private userFormInit(): void {

@@ -1,9 +1,9 @@
 /* Section spacing */
 section {
-  padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 12px;
+  padding-bottom: 6px;
 }
 
 /* Container for buttons and filters */
@@ -23,17 +23,11 @@ section button {
 }
 
 /* Main edit/add buttons */
-section > div:first-child > div > div > button {
-  background-color: #1d4ed8;
+section > div:first-child > button {
+  background-color: #3c63d1;
   color: #fff;
 }
-
-section > div:first-child > div > div > div > button {
-  background-color: #2563eb;
-  color: #fff;
-}
-
-section > div:first-child > div > button {
+section > div:first-child > button:hover {
   background-color: #1d4ed8;
   color: #fff;
 }
@@ -73,25 +67,16 @@ section > div:first-child > div:nth-child(4) {
 
 /* Select styling */
 section select {
-  padding: 5px 10px;
+  padding: 6px 12px;
   border-radius: 5px;
   border: 1px solid #cbd5e1;
 }
 
 /* Search */
 section > div:last-child input {
-  width: 100%;
-  padding: 8px 35px 8px 10px;
+  padding: 10px 16px;
+  width: 97.5%;
+
   border: 1px solid #cbd5e1;
   border-radius: 5px;
-}
-
-section > div:last-child svg {
-  position: absolute;
-  top: 50%;
-  left: 10px;
-  transform: translateY(-50%);
-  width: 16px;
-  height: 16px;
-  fill: #9ca3af;
 }

@@ -1,31 +1,19 @@
 <section>
   <div>
     <!-- Add & Edit Buttons -->
-    <div>
-      <button (click)="onAddUser()">Add User</button>
-    </div>
+    <button (click)="onAddUser()">Add User</button>
 
     <!-- Status Filter -->
     <div>
       <span>Status:</span>
       <label>
-        <input
-          type="radio"
-          name="statusFilter"
-          [value]="true"
-          [(ngModel)]="statusFilter"
-          (change)="onStatusFilterChange()"
-        />
+        <input type="radio" name="statusFilter" [value]="true" [(ngModel)]="statusFilter"
+          (change)="onStatusFilterChange()" />
         Active
       </label>
       <label>
-        <input
-          type="radio"
-          name="statusFilter"
-          [value]="false"
-          [(ngModel)]="statusFilter"
-          (change)="onStatusFilterChange()"
-        />
+        <input type="radio" name="statusFilter" [value]="false" [(ngModel)]="statusFilter"
+          (change)="onStatusFilterChange()" />
         Inactive
       </label>
     </div>
@@ -44,10 +32,7 @@
     <!-- Items Per Page -->
     <div>
       <label for="itemsPerPage">Show:</label>
-      <select
-        [(ngModel)]="itemsPerPageFilter"
-        (change)="onItemsPerPageFilterChange()"
-      >
+      <select [(ngModel)]="itemsPerPageFilter" (change)="onItemsPerPageFilterChange()">
         <option [value]="number" *ngFor="let number of [5, 10, 15, 20]">
           {{ number }}
         </option>
@@ -57,12 +42,6 @@
 
   <!-- Search -->
   <div>
-    <div>
-      <input
-        type="text"
-        placeholder="Search by name, email, or phone..."
-        [formControl]="searchControl"
-      />
-    </div>
+    <input type="text" placeholder="Search by name, email, or phone..." [formControl]="searchControl" />
   </div>
 </section>

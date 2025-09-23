@@ -88,6 +88,9 @@ export class UsersListComponent implements OnInit {
     updatedData: Partial<UserInterface>;
   }) {
     this.userService.updateUser(userData.id, userData.updatedData);
+    if (userData.updatedData.role) {
+      this.loadUsers();
+    }
   }
 
   private loadUsers(): void {
