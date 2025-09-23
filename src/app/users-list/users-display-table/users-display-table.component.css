@@ -149,7 +149,7 @@ select.ng-invalid.ng-touched {
   gap: 8px;
   border-radius: 6px;
 }
-.inline-add td span input[type="text"] {
+.inline-input {
   padding: 8px 12px;
   border: 1px solid #ccc;
   border-radius: 6px;

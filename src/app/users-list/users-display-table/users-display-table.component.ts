@@ -191,8 +191,14 @@ export class UsersDisplayTableComponent
   onAddColumn(row: number) {
     this.addColumn[row] = true;
     this.addColumnForm[row] = new FormGroup({
-      key: new FormControl('', { nonNullable: true }),
-      value: new FormControl('', { nonNullable: true }),
+      key: new FormControl('', {
+        nonNullable: true,
+        validators: [Validators.required],
+      }),
+      value: new FormControl('', {
+        nonNullable: true,
+        validators: [Validators.required],
+      }),
     });
   }
 
@@ -206,8 +212,14 @@ export class UsersDisplayTableComponent
 
     additionalFields.push(
       new FormGroup({
-        key: new FormControl(newField.key, { nonNullable: true }),
-        value: new FormControl(newField.value, { nonNullable: true }),
+        key: new FormControl(newField.key, {
+          nonNullable: true,
+          validators: [Validators.required],
+        }),
+        value: new FormControl(newField.value, {
+          nonNullable: true,
+          validators: [Validators.required],
+        }),
       })
     );
     const userId = this.userFormArray.at(row).value.id!;
@@ -224,7 +236,6 @@ export class UsersDisplayTableComponent
 
   //------------- Remove additional data ------------
   removeAdditional(row: number, itemIndex: number) {
-    console.log(row, itemIndex);
     const additionalFields = this.userFormArray
       .at(row)
       .get('additional') as FormArray;
@@ -240,24 +251,10 @@ export class UsersDisplayTableComponent
     }
   }
 
-  //--------------- Chunk Array Data ----------------
-  chunkArray(
-    arr: FormGroup<AdditionalFormDataInterFace>[] | undefined,
-    chunckSize: number
-  ): FormGroup<AdditionalFormDataInterFace>[][] | [] {
-    if (!arr) return [];
-    const newArr: FormGroup<AdditionalFormDataInterFace>[][] = [];
-    for (let i = 0; i < arr.length; i += chunckSize) {
-      newArr.push(arr.slice(i, i + chunckSize));
-    }
-    return newArr;
-  }
-
   private getUpdatedData(
     formGroup: FormGroup<UserFromDataInterface>
   ): Partial<UserInterface> | null {
     const formValue = formGroup.value;
-    console.log(formValue);
     const updatedData: Partial<UserInterface> = { id: formValue.id! };
     Object.entries(formGroup.controls).forEach(([key, control]) => {
       if (control.dirty) {
@@ -320,8 +317,14 @@ export class UsersDisplayTableComponent
             user.additional?.map(
               (item) =>
                 new FormGroup({
-                  key: new FormControl(item.key, { nonNullable: true }),
-                  value: new FormControl(item.value, { nonNullable: true }),
+                  key: new FormControl(item.key, {
+                    nonNullable: true,
+                    validators: [Validators.required],
+                  }),
+                  value: new FormControl(item.value, {
+                    nonNullable: true,
+                    validators: [Validators.required],
+                  }),
                 })
             ) || []
           ),

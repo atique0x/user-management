@@ -386,23 +386,24 @@
 
       <!-- Additional column -->
       <ng-container
-        *ngFor="
-          let chunk of chunkArray(user.controls.additional?.controls, 7);
-          let chunkIndex = index
-        "
+        *ngFor="let item of user.controls.additional?.controls; let j = index"
       >
         <tr>
           <td></td>
-          <td *ngFor="let item of chunk; let j = index">
+          <td colspan="7">
             <ng-container
               *ngIf="editingRowIndex[i] || editAll; else viewAdditional"
             >
-              <input [formControl]="getControl(item, 'key')" />
-              <input [formControl]="getControl(item, 'value')" />
-              <button
-                (click)="removeAdditional(i, chunkIndex * 7 + j)"
-                class="remove-btn"
-              >
+              <input
+                [formControl]="getControl(item, 'key')"
+                class="inline-input"
+              />
+
+              <input
+                [formControl]="getControl(item, 'value')"
+                class="inline-input"
+              />
+              <button (click)="removeAdditional(i, j)" class="cancel">
                 Remove
               </button>
             </ng-container>
@@ -410,8 +411,8 @@
               <span>
                 <span class="bold-text">{{ item.value.key }}:</span>
                 {{ item.value.value }}
-              </span>
-            </ng-template>
+              </span></ng-template
+            >
           </td>
         </tr>
       </ng-container>
@@ -422,12 +423,28 @@
         <td colspan="7" [formGroup]="addColumnForm[i]">
           <div>
             <input type="text" placeholder="Type a key" formControlName="key" />
+            <p class="error" *ngIf="addColumnForm[i].get('key')?.touched">
+              <span *ngIf="addColumnForm[i].get('key')?.errors?.['required']"
+                >Key is required.</span
+              >
+            </p>
             <input
               type="text"
               placeholder="Type a value"
               formControlName="value"
             />
-            <button class="save" (click)="onSaveColumn(i)">Save</button>
+            <p class="error" *ngIf="addColumnForm[i].get('value')?.touched">
+              <span *ngIf="addColumnForm[i].get('value')?.errors?.['required']"
+                >Value is required.</span
+              >
+            </p>
+            <button
+              class="save"
+              (click)="onSaveColumn(i)"
+              [disabled]="addColumnForm[i].invalid"
+            >
+              Save
+            </button>
             <button class="cancel" (click)="onCancelColumn(i)">Cancel</button>
           </div>
         </td>
