@@ -42,11 +42,13 @@ button:disabled {
 }
 
 .cancel,
-.danger {
+.danger,
+.remove-btn {
   background: #df3e3e;
 }
 .cancel:hover:not(:disabled),
-.danger:hover:not(:disabled) {
+.danger:hover:not(:disabled),
+.remove-btn:hover {
   background: #c53030;
 }
 

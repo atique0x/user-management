@@ -25,24 +25,33 @@
   </thead>
 
   <tbody formArrayName="users">
-    <ng-container *ngFor="let user of userFormArray.controls; let i = index" [formGroupName]="i">
+    <ng-container
+      *ngFor="let user of userFormArray.controls; let i = index"
+      [formGroupName]="i"
+    >
       <tr>
         <!-- Index -->
         <td>{{ i + 1 + (currentPage - 1) * itemsPerPage }}</td>
 
         <!-- Name -->
         <td>
-          <ng-container *ngIf="
+          <ng-container
+            *ngIf="
               editingRowIndex[i] ||
                 editAll ||
                 editingFields[i]?.includes('name');
               else viewName
-            ">
+            "
+          >
             <input type="text" formControlName="name" />
 
             <!-- Name field save action -->
             <span *ngIf="editingFields[i]?.includes('name')">
-              <button class="save" (click)="onSaveField(i, 'name')" [disabled]="user.get('name')?.invalid">
+              <button
+                class="save"
+                (click)="onSaveField(i, 'name')"
+                [disabled]="user.get('name')?.invalid"
+              >
                 ✔
               </button>
               <button class="cancel" (click)="onCancelField(i, 'name')">
@@ -51,31 +60,44 @@
             </span>
 
             <!-- Name validation message -->
-            <p class="error" *ngIf="user.get('name')?.touched && user.get('name')?.invalid">
-              <span *ngIf="user.get('name')?.errors?.['required']">Name is required.</span>
-              <span *ngIf="user.get('name')?.errors?.['minlength']">Name must be at least 3 characters.</span>
+            <p
+              class="error"
+              *ngIf="user.get('name')?.touched && user.get('name')?.invalid"
+            >
+              <span *ngIf="user.get('name')?.errors?.['required']"
+                >Name is required.</span
+              >
+              <span *ngIf="user.get('name')?.errors?.['minlength']"
+                >Name must be at least 3 characters.</span
+              >
             </p>
           </ng-container>
           <ng-template #viewName>
             <span (dblclick)="onEditField(i, 'name')">{{
               user.value.name
-              }}</span>
+            }}</span>
           </ng-template>
         </td>
 
         <!-- Email -->
         <td>
-          <ng-container *ngIf="
+          <ng-container
+            *ngIf="
               editingRowIndex[i] ||
                 editAll ||
                 editingFields[i]?.includes('email');
               else viewEmail
-            ">
+            "
+          >
             <input type="text" formControlName="email" />
 
             <!-- Email field save action -->
             <span *ngIf="editingFields[i]?.includes('email')">
-              <button class="save" (click)="onSaveField(i, 'email')" [disabled]="user.get('email')?.invalid">
+              <button
+                class="save"
+                (click)="onSaveField(i, 'email')"
+                [disabled]="user.get('email')?.invalid"
+              >
                 ✔
               </button>
               <button class="cancel" (click)="onCancelField(i, 'email')">
@@ -84,32 +106,47 @@
             </span>
 
             <!-- Email validation message -->
-            <p class="error" *ngIf="user.get('email')?.touched && user.get('email')?.invalid">
-              <span *ngIf="user.get('email')?.errors?.['required']">Email is required.</span>
-              <span *ngIf="user.get('email')?.errors?.['email']">Please provide a valid email.</span>
-              <span *ngIf="user.get('email')?.errors?.['emailTaken']">Email already exists, provide another.</span>
+            <p
+              class="error"
+              *ngIf="user.get('email')?.touched && user.get('email')?.invalid"
+            >
+              <span *ngIf="user.get('email')?.errors?.['required']"
+                >Email is required.</span
+              >
+              <span *ngIf="user.get('email')?.errors?.['email']"
+                >Please provide a valid email.</span
+              >
+              <span *ngIf="user.get('email')?.errors?.['emailTaken']"
+                >Email already exists, provide another.</span
+              >
             </p>
           </ng-container>
           <ng-template #viewEmail>
             <span (dblclick)="onEditField(i, 'email')">{{
               user.value.email
-              }}</span>
+            }}</span>
           </ng-template>
         </td>
 
         <!-- Phone -->
         <td>
-          <ng-container *ngIf="
+          <ng-container
+            *ngIf="
               editingRowIndex[i] ||
                 editAll ||
                 editingFields[i]?.includes('phone');
               else viewPhone
-            ">
+            "
+          >
             <input type="text" formControlName="phone" />
 
             <!-- Phone field save action -->
             <span *ngIf="editingFields[i]?.includes('phone')">
-              <button class="save" (click)="onSaveField(i, 'phone')" [disabled]="user.get('phone')?.invalid">
+              <button
+                class="save"
+                (click)="onSaveField(i, 'phone')"
+                [disabled]="user.get('phone')?.invalid"
+              >
                 ✔
               </button>
               <button class="cancel" (click)="onCancelField(i, 'phone')">
@@ -118,31 +155,44 @@
             </span>
 
             <!-- Phone validation message -->
-            <p class="error" *ngIf="user.get('phone')?.touched && user.get('phone')?.invalid">
-              <span *ngIf="user.get('phone')?.errors?.['required']">Phone number is required.</span>
-              <span *ngIf="user.get('phone')?.errors?.['pattern']">Provide a valid phone number (01XXXXXXXXX).</span>
+            <p
+              class="error"
+              *ngIf="user.get('phone')?.touched && user.get('phone')?.invalid"
+            >
+              <span *ngIf="user.get('phone')?.errors?.['required']"
+                >Phone number is required.</span
+              >
+              <span *ngIf="user.get('phone')?.errors?.['pattern']"
+                >Provide a valid phone number (01XXXXXXXXX).</span
+              >
             </p>
           </ng-container>
           <ng-template #viewPhone>
             <span (dblclick)="onEditField(i, 'phone')">{{
               user.value.phone
-              }}</span>
+            }}</span>
           </ng-template>
         </td>
 
         <!-- DOB -->
         <td>
-          <ng-container *ngIf="
+          <ng-container
+            *ngIf="
               editingRowIndex[i] ||
                 editAll ||
                 editingFields[i]?.includes('dob');
               else viewDOB
-            ">
+            "
+          >
             <input type="date" formControlName="dob" />
 
             <!-- DOB field save action -->
             <span *ngIf="editingFields[i]?.includes('dob')">
-              <button class="save" (click)="onSaveField(i, 'dob')" [disabled]="user.get('dob')?.invalid">
+              <button
+                class="save"
+                (click)="onSaveField(i, 'dob')"
+                [disabled]="user.get('dob')?.invalid"
+              >
                 ✔
               </button>
               <button class="cancel" (click)="onCancelField(i, 'dob')">
@@ -151,7 +201,10 @@
             </span>
 
             <!-- DOB validation message -->
-            <p class="error" *ngIf="user.get('dob')?.touched && user.get('dob')?.invalid">
+            <p
+              class="error"
+              *ngIf="user.get('dob')?.touched && user.get('dob')?.invalid"
+            >
               Date of Birth is required.
             </p>
           </ng-container>
@@ -159,23 +212,29 @@
           <ng-template #viewDOB>
             <span (dblclick)="onEditField(i, 'dob')">{{
               user.value.dob | date
-              }}</span>
+            }}</span>
           </ng-template>
         </td>
 
         <!-- Address -->
         <td>
-          <ng-container *ngIf="
+          <ng-container
+            *ngIf="
               editingRowIndex[i] ||
                 editAll ||
                 editingFields[i]?.includes('address');
               else viewAddress
-            ">
+            "
+          >
             <input type="text" formControlName="address" />
 
             <!-- Address field save action -->
             <span *ngIf="editingFields[i]?.includes('address')">
-              <button class="save" (click)="onSaveField(i, 'address')" [disabled]="user.get('address')?.invalid">
+              <button
+                class="save"
+                (click)="onSaveField(i, 'address')"
+                [disabled]="user.get('address')?.invalid"
+              >
                 ✔
               </button>
               <button class="cancel" (click)="onCancelField(i, 'address')">
@@ -184,29 +243,38 @@
             </span>
 
             <!-- Address validation message -->
-            <p class="error" *ngIf="
+            <p
+              class="error"
+              *ngIf="
                 user.get('address')?.touched && user.get('address')?.invalid
-              ">
-              <span *ngIf="user.get('address')?.errors?.['required']">Address is required.</span>
-              <span *ngIf="user.get('address')?.errors?.['minlength']">Address must be at least 3 characters.</span>
+              "
+            >
+              <span *ngIf="user.get('address')?.errors?.['required']"
+                >Address is required.</span
+              >
+              <span *ngIf="user.get('address')?.errors?.['minlength']"
+                >Address must be at least 3 characters.</span
+              >
             </p>
           </ng-container>
 
           <ng-template #viewAddress>
             <span (dblclick)="onEditField(i, 'address')">{{
-              user.value.address
-              }}</span>
+              user.value.address | titlecase
+            }}</span>
           </ng-template>
         </td>
 
         <!-- Role -->
         <td>
-          <ng-container *ngIf="
+          <ng-container
+            *ngIf="
               editingRowIndex[i] ||
                 editAll ||
                 editingFields[i]?.includes('role');
               else viewRole
-            ">
+            "
+          >
             <select formControlName="role">
               <option *ngFor="let role of roles" [value]="role">
                 {{ role | titlecase }}
@@ -215,7 +283,11 @@
 
             <!-- Role field save action -->
             <span *ngIf="editingFields[i]?.includes('role')">
-              <button class="save" (click)="onSaveField(i, 'role')" [disabled]="user.get('role')?.invalid">
+              <button
+                class="save"
+                (click)="onSaveField(i, 'role')"
+                [disabled]="user.get('role')?.invalid"
+              >
                 ✔
               </button>
               <button class="cancel" (click)="onCancelField(i, 'role')">
@@ -226,18 +298,20 @@
           <ng-template #viewRole>
             <span (dblclick)="onEditField(i, 'role')">{{
               user.value.role | titlecase
-              }}</span>
+            }}</span>
           </ng-template>
         </td>
 
         <!-- Status -->
         <td>
-          <ng-container *ngIf="
+          <ng-container
+            *ngIf="
               editingRowIndex[i] ||
                 editAll ||
                 editingFields[i]?.includes('status');
               else viewStatus
-            ">
+            "
+          >
             <span>{{ user.value.status ? "Active" : "Inactive" }}</span>
           </ng-container>
           <ng-template #viewStatus>
@@ -248,11 +322,20 @@
         <!-- Actions -->
         <td class="action-btn">
           <!-- Inline Edit -->
-          <button class="edit" *ngIf="!editingRowIndex[i]" (click)="onEditRow(i)" [disabled]="editAll">
+          <button
+            class="edit"
+            *ngIf="!editingRowIndex[i]"
+            (click)="onEditRow(i)"
+            [disabled]="editAll"
+          >
             Inline Edit
           </button>
           <div *ngIf="editingRowIndex[i]">
-            <button class="save" (click)="onSaveRow(i)" [disabled]="user.invalid">
+            <button
+              class="save"
+              (click)="onSaveRow(i)"
+              [disabled]="user.invalid"
+            >
               Save
             </button>
             <button class="cancel" (click)="onCancelRow(i)">Cancel</button>
@@ -260,19 +343,35 @@
 
           <!-- Status-based actions -->
           <span *ngIf="user.value.status" class="gap-button">
-            <button class="success" (click)="onUpdateUser(user.value.id)" [disabled]="editAll || editingRowIndex[i]">
+            <button
+              class="success"
+              (click)="onUpdateUser(user.value.id)"
+              [disabled]="editAll || editingRowIndex[i]"
+            >
               Update
             </button>
-            <button class="danger" (click)="onToggleStatus(user.value.id)" [disabled]="editAll || editingRowIndex[i]">
+            <button
+              class="danger"
+              (click)="onToggleStatus(user.value.id)"
+              [disabled]="editAll || editingRowIndex[i]"
+            >
               Inactive
             </button>
           </span>
 
           <span *ngIf="!user.value.status" class="gap-button">
-            <button class="danger" (click)="onDeleteUser(user.value.id)" [disabled]="editAll || editingRowIndex[i]">
+            <button
+              class="danger"
+              (click)="onDeleteUser(user.value.id)"
+              [disabled]="editAll || editingRowIndex[i]"
+            >
               Delete
             </button>
-            <button class="success" (click)="onToggleStatus(user.value.id)" [disabled]="editAll || editingRowIndex[i]">
+            <button
+              class="success"
+              (click)="onToggleStatus(user.value.id)"
+              [disabled]="editAll || editingRowIndex[i]"
+            >
               Reactive
             </button>
           </span>
@@ -286,17 +385,24 @@
       </tr>
 
       <!-- Additional column -->
-      <ng-container *ngFor="
+      <ng-container
+        *ngFor="
           let chunk of chunkArray(user.controls.additional?.controls, 7);
           let chunkIndex = index
-        ">
+        "
+      >
         <tr>
           <td></td>
           <td *ngFor="let item of chunk; let j = index">
-            <ng-container *ngIf="editingRowIndex[i] || editAll; else viewAdditional">
+            <ng-container
+              *ngIf="editingRowIndex[i] || editAll; else viewAdditional"
+            >
               <input [formControl]="getControl(item, 'key')" />
               <input [formControl]="getControl(item, 'value')" />
-              <button (click)="removeAdditional(i, chunkIndex * 7 + j)">
+              <button
+                (click)="removeAdditional(i, chunkIndex * 7 + j)"
+                class="remove-btn"
+              >
                 Remove
               </button>
             </ng-container>
@@ -312,10 +418,14 @@
 
       <!-- Inline add column -->
       <tr *ngIf="addColumn[i]" class="inline-add">
-        <td colspan="8" [formGroup]="addColumnForm[i]">
+        <td colspan="9" [formGroup]="addColumnForm[i]">
           <div>
             <input type="text" placeholder="Type a key" formControlName="key" />
-            <input type="text" placeholder="Type a value" formControlName="value" />
+            <input
+              type="text"
+              placeholder="Type a value"
+              formControlName="value"
+            />
             <button class="save" (click)="onSaveColumn(i)">Save</button>
             <button class="cancel" (click)="onCancelColumn(i)">Cancel</button>
           </div>
@@ -327,10 +437,19 @@
     <tr *ngIf="userFormArray.controls.length <= 0">
       <td colspan="8" class="no-users-cell">
         <div class="no-users-content">
-          <svg xmlns="http://www.w3.org/2000/svg" class="no-users-icon" fill="none" viewBox="0 0 24 24"
-            stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M9 14l2-2 4 4M7 10h10M5 6h14M5 18h14" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="no-users-icon"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 14l2-2 4 4M7 10h10M5 6h14M5 18h14"
+            />
           </svg>
           <p class="no-users-title">No users found</p>
           <p class="no-users-subtitle">Try adjusting your filters or search</p>
