@@ -134,6 +134,8 @@ tbody input[type="date"]:focus {
 }
 
 .action-btn button,
+.save,
+.cancel,
 .inline-add button {
   padding: 6px 12px;
   border: none;
@@ -238,4 +240,8 @@ tr.inline-add td span input[type="text"] {
   border-radius: 6px;
   font-size: 14px;
   transition: border-color 0.2s ease;
+}
+
+.bold-text {
+  font-weight: 600;
 }

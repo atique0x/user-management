@@ -5,6 +5,8 @@ import {
   SimpleChanges,
   EventEmitter,
   Output,
+  OnChanges,
+  OnDestroy,
 } from '@angular/core';
 import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 
@@ -23,7 +25,9 @@ import { emailExistValidator } from 'src/app/validators/email-exist-validator';
   templateUrl: './users-display-table.component.html',
   styleUrls: ['./users-display-table.component.css'],
 })
-export class UsersDisplayTableComponent implements OnInit {
+export class UsersDisplayTableComponent
+  implements OnInit, OnChanges, OnDestroy
+{
   @Input() users: UserInterface[] = [];
   @Output() userDeleted = new EventEmitter<string>();
   @Output() userToggleStatus = new EventEmitter<string>();
@@ -66,53 +70,6 @@ export class UsersDisplayTableComponent implements OnInit {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['users'] && !changes['users'].firstChange)
       this.setupUsersForm();
-  }
-
-  onAddColumn(row: number) {
-    this.addColumn[row] = true;
-    this.addColumnForm[row] = new FormGroup({
-      key: new FormControl('', { nonNullable: true }),
-      value: new FormControl('', { nonNullable: true }),
-    });
-  }
-
-  onSaveColumn(row: number) {
-    const tempForm = this.addColumnForm[row];
-    if (!tempForm.valid) return;
-    const newField = tempForm.value;
-    const additionalFields = this.userFormArray
-      .at(row)
-      .get('additional') as FormArray;
-
-    additionalFields.push(
-      new FormGroup({
-        key: new FormControl(newField.key, { nonNullable: true }),
-        value: new FormControl(newField.value, { nonNullable: true }),
-      })
-    );
-    this.addColumn[row] = false;
-  }
-
-  onCancelColumn(row: number) {
-    this.addColumn[row] = false;
-  }
-
-  removeAdditional(row: number, itemIndex: number) {
-    const additionalFields = this.userFormArray
-      .at(row)
-      .get('additional') as FormArray;
-    const userId = this.userFormArray.at(row).value.id!;
-
-    if (itemIndex >= 0 && itemIndex < additionalFields.length) {
-      additionalFields.removeAt(itemIndex);
-
-      const updatedAdditional = additionalFields.value;
-
-      this.userBulkFieldUpdate.emit({
-        id: userId,
-        updatedData: { additional: updatedAdditional },
-      });
-    }
   }
 
   //--------------- User Actions ------------------
@@ -227,6 +184,54 @@ export class UsersDisplayTableComponent implements OnInit {
     }
   }
 
+  //----------------- Add Column ------------------
+  onAddColumn(row: number) {
+    this.addColumn[row] = true;
+    this.addColumnForm[row] = new FormGroup({
+      key: new FormControl('', { nonNullable: true }),
+      value: new FormControl('', { nonNullable: true }),
+    });
+  }
+
+  onSaveColumn(row: number) {
+    const tempForm = this.addColumnForm[row];
+    if (!tempForm.valid) return;
+    const newField = tempForm.value;
+    const additionalFields = this.userFormArray
+      .at(row)
+      .get('additional') as FormArray;
+
+    additionalFields.push(
+      new FormGroup({
+        key: new FormControl(newField.key, { nonNullable: true }),
+        value: new FormControl(newField.value, { nonNullable: true }),
+      })
+    );
+    this.addColumn[row] = false;
+  }
+
+  onCancelColumn(row: number) {
+    this.addColumn[row] = false;
+  }
+
+  removeAdditional(row: number, itemIndex: number) {
+    const additionalFields = this.userFormArray
+      .at(row)
+      .get('additional') as FormArray;
+    const userId = this.userFormArray.at(row).value.id!;
+
+    if (itemIndex >= 0 && itemIndex < additionalFields.length) {
+      additionalFields.removeAt(itemIndex);
+
+      const updatedAdditional = additionalFields.value;
+
+      this.userBulkFieldUpdate.emit({
+        id: userId,
+        updatedData: { additional: updatedAdditional },
+      });
+    }
+  }
+
   private getUpdatedData(
     formGroup: FormGroup<UserFromDataInterface>
   ): Partial<UserInterface> | null {
@@ -311,5 +316,9 @@ export class UsersDisplayTableComponent implements OnInit {
     return this.usersForm.get('users') as FormArray<
       FormGroup<UserFromDataInterface>
     >;
+  }
+
+  ngOnDestroy() {
+    this.queryParamsSub?.unsubscribe();
   }
 }
