@@ -19,6 +19,7 @@ import {
 import { ActivatedRoute, Params } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { emailExistValidator } from 'src/app/validators/email-exist-validator';
+import { bulkEmailValidator } from 'src/app/validators/bulk-email-validator';
 
 @Component({
   selector: 'app-users-display-table',
@@ -266,9 +267,12 @@ export class UsersDisplayTableComponent
 
   private setupUsersForm(): void {
     const userForms = this.createUserFormGroups();
-    this.usersForm = new FormGroup({
-      users: new FormArray(userForms),
-    });
+    this.usersForm = new FormGroup(
+      {
+        users: new FormArray(userForms),
+      },
+      { validators: [bulkEmailValidator] }
+    );
   }
 
   private createUserFormGroups(): FormGroup<UserFromDataInterface>[] {

@@ -116,7 +116,8 @@
               <span *ngIf="user.get('email')?.errors?.['email']"
                 >Please provide a valid email.</span
               >
-              <span *ngIf="user.get('email')?.errors?.['emailTaken']"
+              <span
+                *ngIf="user.get('email')?.errors?.['emailTaken'] || user.get('email')?.errors?.['duplicateInBatch']"
                 >Email already exists, provide another.</span
               >
             </p>
