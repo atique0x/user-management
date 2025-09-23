@@ -66,10 +66,6 @@ export class UsersDisplayTableComponent
       this.itemsPerPage =
         !isNaN(limit) && limit > 0 ? limit : this.itemsPerPage;
     });
-
-    this.userFormArray.controls.forEach((crtl) => {
-      crtl.controls.email.valueChanges.subscribe((email) => console.log(email));
-    });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
