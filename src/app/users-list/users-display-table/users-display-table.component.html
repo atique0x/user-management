@@ -418,7 +418,8 @@
 
       <!-- Inline add column -->
       <tr *ngIf="addColumn[i]" class="inline-add">
-        <td colspan="9" [formGroup]="addColumnForm[i]">
+        <td></td>
+        <td colspan="7" [formGroup]="addColumnForm[i]">
           <div>
             <input type="text" placeholder="Type a key" formControlName="key" />
             <input
@@ -430,6 +431,7 @@
             <button class="cancel" (click)="onCancelColumn(i)">Cancel</button>
           </div>
         </td>
+        <td></td>
       </tr>
     </ng-container>
 

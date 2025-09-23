@@ -180,7 +180,6 @@ select.ng-invalid.ng-touched {
   display: flex;
   gap: 8px;
   border-radius: 6px;
-  width: 90%;
 }
 .inline-add td span input[type="text"] {
   padding: 8px 12px;
