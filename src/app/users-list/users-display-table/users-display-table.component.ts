@@ -68,8 +68,12 @@ export class UsersDisplayTableComponent
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['users'] && !changes['users'].firstChange)
+    if (changes['users'] && !changes['users'].firstChange) {
       this.setupUsersForm();
+      this.editAll = false;
+      this.editingRowIndex = [];
+      this.editingFields = {};
+    }
   }
 
   //--------------- User Actions ------------------
