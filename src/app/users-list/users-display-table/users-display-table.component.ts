@@ -124,17 +124,37 @@ export class UsersDisplayTableComponent
     this.editAll = true;
     this.editingRowIndex = [];
     this.editingFields = {};
+
+    this.userFormArray.controls.forEach(
+      (formGroup: FormGroup<UserFromDataInterface>) => {
+        const emailControl = formGroup.get('email');
+        emailControl?.setValidators([Validators.required, Validators.email]);
+        emailControl?.updateValueAndValidity();
+      }
+    );
+    this.usersForm.setValidators(bulkEmailValidator(this.userEmail));
+    this.usersForm.updateValueAndValidity();
   }
 
   onSaveAll() {
     this.userFormArray.controls.forEach(
-      (formGroup: FormGroup<UserFromDataInterface>) => {
+      (formGroup: FormGroup<UserFromDataInterface>, i) => {
         const updatedData = this.getUpdatedData(formGroup);
         if (updatedData)
           this.userBulkFieldUpdate.emit({ id: updatedData.id!, updatedData });
+
+        const emailControl = formGroup.get('email');
+        emailControl?.setValidators([
+          Validators.required,
+          Validators.email,
+          emailExistValidator(this.users[i].email),
+        ]);
+        emailControl?.updateValueAndValidity();
       }
     );
     this.editAll = false;
+    this.usersForm.setValidators([]);
+    this.usersForm.updateValueAndValidity();
   }
 
   onCancelAll() {
@@ -147,9 +167,18 @@ export class UsersDisplayTableComponent
             control.markAsPristine();
           }
         });
+        const emailControl = formGroup.get('email');
+        emailControl?.setValidators([
+          Validators.required,
+          Validators.email,
+          emailExistValidator(this.users[i].email),
+        ]);
+        emailControl?.updateValueAndValidity();
       }
     );
     this.editAll = false;
+    this.usersForm.setValidators([]);
+    this.usersForm.updateValueAndValidity();
   }
 
   // ---------------- Field Edit ----------------
@@ -267,12 +296,9 @@ export class UsersDisplayTableComponent
 
   private setupUsersForm(): void {
     const userForms = this.createUserFormGroups();
-    this.usersForm = new FormGroup(
-      {
-        users: new FormArray(userForms),
-      },
-      { validators: [bulkEmailValidator] }
-    );
+    this.usersForm = new FormGroup({
+      users: new FormArray(userForms),
+    });
   }
 
   private createUserFormGroups(): FormGroup<UserFromDataInterface>[] {
@@ -344,6 +370,10 @@ export class UsersDisplayTableComponent
     return this.usersForm.get('users') as FormArray<
       FormGroup<UserFromDataInterface>
     >;
+  }
+
+  get userEmail() {
+    return this.users.map((user) => user.email);
   }
 
   ngOnDestroy() {

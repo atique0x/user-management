@@ -3,39 +3,50 @@ import {
   ValidationErrors,
   FormArray,
   FormGroup,
+  ValidatorFn,
 } from '@angular/forms';
 
-export function bulkEmailValidator(
-  control: AbstractControl
-): ValidationErrors | null {
-  const formArray = control.get('users') as FormArray;
-  if (!formArray) return null;
+export function bulkEmailValidator(currentEmails: string[]): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const formArray = control.get('users') as FormArray;
+    if (!formArray) return null;
 
-  const emails: string[] = formArray.controls.map(
-    (c) => c.get('email')?.value?.toLowerCase() || ''
-  );
+    const pageEmails = currentEmails
+      .map((email) => email.toLowerCase())
+      .filter((email) => email);
 
-  const duplicates = emails.filter(
-    (email, index) => emails.indexOf(email) !== index && email
-  );
+    const emails: string[] = formArray.controls.map(
+      (c) => c.get('email')?.value?.toLowerCase() || ''
+    );
 
-  formArray.controls.forEach((group: AbstractControl) => {
-    const emailControl = (group as FormGroup).get('email');
-    if (!emailControl) return;
+    const users = JSON.parse(localStorage.getItem('users') || '[]') as {
+      email: string;
+    }[];
 
-    const email = emailControl.value?.toLowerCase() || '';
-    const errors: ValidationErrors = { ...emailControl.errors };
+    const storedEmails = users
+      .map((user) => user.email.toLowerCase())
+      .filter((e) => !pageEmails.includes(e));
 
-    if (errors['duplicateInBatch']) {
+    const duplicatesInForm = emails.filter(
+      (email, index) => emails.indexOf(email) !== index && email
+    );
+
+    formArray.controls.forEach((group: AbstractControl) => {
+      const emailControl = (group as FormGroup).get('email');
+      if (!emailControl) return;
+
+      const email = emailControl.value?.toLowerCase() || '';
+      const errors: ValidationErrors = { ...emailControl.errors };
+
       delete errors['duplicateInBatch'];
-    }
 
-    if (duplicates.includes(email)) {
-      errors['duplicateInBatch'] = true;
-    }
+      if (duplicatesInForm.includes(email) || storedEmails.includes(email)) {
+        errors['duplicateInBatch'] = true;
+      }
 
-    emailControl.setErrors(Object.keys(errors).length ? errors : null);
-  });
+      emailControl.setErrors(Object.keys(errors).length ? errors : null);
+    });
 
-  return null;
+    return null;
+  };
 }
