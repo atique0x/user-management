@@ -57,17 +57,7 @@ export class UsersDisplayTableComponent
 
   ngOnInit(): void {
     this.setupUsersForm();
-
-    this.route.queryParams
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((params: Params) => {
-        const page = Number(params['page']);
-        const limit = Number(params['limit']);
-
-        this.currentPage = !isNaN(page) && page > 0 ? page : 1;
-        this.itemsPerPage =
-          !isNaN(limit) && limit > 0 ? limit : this.itemsPerPage;
-      });
+    this.handleRouteParams();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -111,13 +101,7 @@ export class UsersDisplayTableComponent
 
   onCancelRow(row: number) {
     const rowGroup = this.userFormArray.at(row);
-    Object.keys(rowGroup.controls).forEach((key) => {
-      const control = rowGroup.get(key);
-      if (control?.dirty) {
-        control.setValue(this.users[row][key as keyof UserInterface]);
-        control.markAsPristine();
-      }
-    });
+    this.dirtyCancel(rowGroup, row);
     this.editingRowIndex[row] = false;
   }
 
@@ -126,16 +110,7 @@ export class UsersDisplayTableComponent
     this.editAll = true;
     this.editingRowIndex = [];
     this.editingFields = {};
-
-    this.userFormArray.controls.forEach(
-      (formGroup: FormGroup<UserFromDataInterface>) => {
-        const emailControl = formGroup.get('email');
-        emailControl?.setValidators([Validators.required, Validators.email]);
-        emailControl?.updateValueAndValidity();
-      }
-    );
-    this.usersForm.setValidators(bulkEmailValidator(this.userEmail));
-    this.usersForm.updateValueAndValidity();
+    this.setValidatorForBulkUpdate();
   }
 
   onSaveAll() {
@@ -144,14 +119,7 @@ export class UsersDisplayTableComponent
         const updatedData = this.getUpdatedData(formGroup);
         if (updatedData)
           this.userBulkFieldUpdate.emit({ id: updatedData.id!, updatedData });
-
-        const emailControl = formGroup.get('email');
-        emailControl?.setValidators([
-          Validators.required,
-          Validators.email,
-          emailExistValidator(this.users[i].email),
-        ]);
-        emailControl?.updateValueAndValidity();
+        this.setExisitngValidator(formGroup, i);
       }
     );
     this.editAll = false;
@@ -162,20 +130,8 @@ export class UsersDisplayTableComponent
   onCancelAll() {
     this.userFormArray.controls.forEach(
       (formGroup: FormGroup<UserFromDataInterface>, i) => {
-        Object.keys(formGroup.controls).forEach((key) => {
-          const control = formGroup.get(key);
-          if (control?.dirty) {
-            control.setValue(this.users[i][key as keyof UserInterface]);
-            control.markAsPristine();
-          }
-        });
-        const emailControl = formGroup.get('email');
-        emailControl?.setValidators([
-          Validators.required,
-          Validators.email,
-          emailExistValidator(this.users[i].email),
-        ]);
-        emailControl?.updateValueAndValidity();
+        this.dirtyCancel(formGroup, i);
+        this.setExisitngValidator(formGroup, i);
       }
     );
     this.editAll = false;
@@ -362,6 +318,54 @@ export class UsersDisplayTableComponent
           ),
         })
     );
+  }
+
+  private handleRouteParams() {
+    this.route.queryParams
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((params: Params) => {
+        const page = Number(params['page']);
+        const limit = Number(params['limit']);
+
+        this.currentPage = !isNaN(page) && page > 0 ? page : 1;
+        this.itemsPerPage =
+          !isNaN(limit) && limit > 0 ? limit : this.itemsPerPage;
+      });
+  }
+
+  private dirtyCancel(
+    formGroup: FormGroup<UserFromDataInterface>,
+    index: number
+  ) {
+    Object.keys(formGroup.controls).forEach((key) => {
+      const control = formGroup.get(key);
+      if (control?.dirty) {
+        control.setValue(this.users[index][key as keyof UserInterface]);
+        control.markAsPristine();
+      }
+    });
+  }
+
+  private setValidatorForBulkUpdate() {
+    this.userFormArray.controls.forEach(
+      (formGroup: FormGroup<UserFromDataInterface>) => {
+        const emailControl = formGroup.get('email');
+        emailControl?.setValidators([Validators.required, Validators.email]);
+        emailControl?.updateValueAndValidity();
+      }
+    );
+    this.usersForm.setValidators(bulkEmailValidator(this.userEmail));
+    this.usersForm.updateValueAndValidity();
+  }
+
+  private setExisitngValidator(formGroup: FormGroup, index: number) {
+    const emailControl = formGroup.get('email');
+    emailControl?.setValidators([
+      Validators.required,
+      Validators.email,
+      emailExistValidator(this.users[index].email),
+    ]);
+    emailControl?.updateValueAndValidity();
   }
 
   get userFormArray(): FormArray<FormGroup<UserFromDataInterface>> {
