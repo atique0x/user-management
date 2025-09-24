@@ -389,21 +389,14 @@
       <ng-container
         *ngFor="let item of user.controls.additional?.controls; let j = index"
       >
-        <tr>
+        <tr [formGroup]="item">
           <td></td>
-          <td colspan="7">
+          <td colspan="8">
             <ng-container
               *ngIf="editingRowIndex[i] || editAll; else viewAdditional"
             >
-              <input
-                [formControl]="getControl(item, 'key')"
-                class="inline-input"
-              />
-
-              <input
-                [formControl]="getControl(item, 'value')"
-                class="inline-input"
-              />
+              <input formControlName="key" class="inline-input" />
+              <input formControlName="value" class="inline-input" />
               <button (click)="removeAdditional(i, j)" class="cancel">
                 Remove
               </button>

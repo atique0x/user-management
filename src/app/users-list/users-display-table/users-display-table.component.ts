@@ -362,10 +362,6 @@ export class UsersDisplayTableComponent
     );
   }
 
-  getControl(item: FormGroup, field: string): FormControl {
-    return item.get(field) as FormControl;
-  }
-
   get userFormArray(): FormArray<FormGroup<UserFromDataInterface>> {
     return this.usersForm.get('users') as FormArray<
       FormGroup<UserFromDataInterface>
