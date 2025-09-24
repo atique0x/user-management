@@ -5,7 +5,7 @@ import { UsersService } from '../users.service';
 import { UserInterface } from '../types/user.interface';
 import { StatusType } from '../types/status.type';
 import { UserRoleEnum } from '../types/user-role.enum';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-users-list',
@@ -23,7 +23,7 @@ export class UsersListComponent implements OnInit {
   itemsPerPage = 10;
   totalPages = 1;
 
-  private queryParamsSub?: Subscription;
+  private destroy$ = new Subject<void>();
 
   constructor(
     private userService: UsersService,
@@ -114,25 +114,27 @@ export class UsersListComponent implements OnInit {
   }
 
   private initQueryParamsSubscription() {
-    this.queryParamsSub = this.route.queryParams.subscribe((params: Params) => {
-      const page = Number(params['page']);
-      const limit = Number(params['limit']);
+    this.route.queryParams
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((params: Params) => {
+        const page = Number(params['page']);
+        const limit = Number(params['limit']);
 
-      this.currentPage = !isNaN(page) && page > 0 ? page : 1;
-      this.itemsPerPage =
-        !isNaN(limit) && limit > 0 ? limit : this.itemsPerPage;
+        this.currentPage = !isNaN(page) && page > 0 ? page : 1;
+        this.itemsPerPage =
+          !isNaN(limit) && limit > 0 ? limit : this.itemsPerPage;
 
-      if (params['status'] === 'true') {
-        this.status = true;
-      } else if (params['status'] === 'false') {
-        this.status = false;
-      } else {
-        this.status = true;
-      }
-      this.role = params['role'] ? params['role'] : 'default';
-      this.searchText = params['search'];
-      this.loadUsers();
-    });
+        if (params['status'] === 'true') {
+          this.status = true;
+        } else if (params['status'] === 'false') {
+          this.status = false;
+        } else {
+          this.status = true;
+        }
+        this.role = params['role'] ? params['role'] : 'default';
+        this.searchText = params['search'];
+        this.loadUsers();
+      });
   }
 
   private updateQueryParams(
@@ -151,6 +153,7 @@ export class UsersListComponent implements OnInit {
   }
 
   ngOnDestroy() {
-    this.queryParamsSub?.unsubscribe();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

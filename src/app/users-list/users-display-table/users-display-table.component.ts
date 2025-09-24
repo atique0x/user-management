@@ -17,7 +17,7 @@ import {
   UserFromDataInterface,
 } from 'src/app/types/form-data.interface';
 import { ActivatedRoute, Params } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription, takeUntil } from 'rxjs';
 import { emailExistValidator } from 'src/app/validators/email-exist-validator';
 import { bulkEmailValidator } from 'src/app/validators/bulk-email-validator';
 
@@ -51,21 +51,23 @@ export class UsersDisplayTableComponent
   currentPage = 1;
   itemsPerPage = 10;
 
-  private queryParamsSub?: Subscription;
+  private destroy$ = new Subject<void>();
 
   constructor(private route: ActivatedRoute) {}
 
   ngOnInit(): void {
     this.setupUsersForm();
 
-    this.queryParamsSub = this.route.queryParams.subscribe((params: Params) => {
-      const page = Number(params['page']);
-      const limit = Number(params['limit']);
+    this.route.queryParams
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((params: Params) => {
+        const page = Number(params['page']);
+        const limit = Number(params['limit']);
 
-      this.currentPage = !isNaN(page) && page > 0 ? page : 1;
-      this.itemsPerPage =
-        !isNaN(limit) && limit > 0 ? limit : this.itemsPerPage;
-    });
+        this.currentPage = !isNaN(page) && page > 0 ? page : 1;
+        this.itemsPerPage =
+          !isNaN(limit) && limit > 0 ? limit : this.itemsPerPage;
+      });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -373,6 +375,7 @@ export class UsersDisplayTableComponent
   }
 
   ngOnDestroy() {
-    this.queryParamsSub?.unsubscribe();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }
