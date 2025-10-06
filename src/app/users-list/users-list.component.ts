@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
 
 import { UsersService } from '../users.service';
 import { UserInterface } from '../types/user.interface';
 import { StatusType } from '../types/status.type';
 import { UserRoleEnum } from '../types/user-role.enum';
-import { Subject, Subscription, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-users-list',
@@ -32,37 +32,31 @@ export class UsersListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.initQueryParamsSubscription();
-    this.loadUsers();
+    this.initQueryParams();
   }
 
-  //--------------- Pagination & Filtering ---------------
-  onPageChange(newPage: number): void {
-    this.currentPage = newPage;
-    this.updateQueryParams({ page: newPage });
+  //-------- Pagination & Filtering --------
+  onPageChange(page: number): void {
+    this.updateQueryParams({ page });
   }
 
   handleStatusChange(status: StatusType) {
-    this.status = status;
-    this.updateQueryParams({ status: status });
+    this.updateQueryParams({ status });
   }
 
   handleRoleChange(role: UserRoleEnum | 'default') {
-    this.role = role;
-    this.updateQueryParams({ role: role });
+    this.updateQueryParams({ role });
   }
 
-  handleItemsPerPageChange(item: number) {
-    this.itemsPerPage = item;
-    this.updateQueryParams({ limit: item });
+  handleItemsPerPageChange(limit: number) {
+    this.updateQueryParams({ limit });
   }
 
-  handleSearchChange(searchText: string) {
-    this.searchText = searchText;
-    this.updateQueryParams({ search: searchText });
+  handleSearchChange(search: string) {
+    this.updateQueryParams({ search });
   }
 
-  //------------------ User Action -------------------
+  //------------ User Action ------------
   handleUserDelete(userId: string) {
     if (confirm('Are you sure you want to delete this user?')) {
       this.userService.deleteUser(userId);
@@ -91,49 +85,86 @@ export class UsersListComponent implements OnInit {
     this.loadUsers();
   }
 
+  /**
+   * Fetches paginated and filtered users from the service and updates the component state
+   * This method:
+   * 1. Gets paginated users based on current filters and pagination settings
+   * 2. Calculates total pages based on total users and items per page
+   * 3. Handles edge cases by adjusting current page if it's out of bounds
+   * 4. Updates the users array in the component
+   * @private
+   * @returns {void}
+   */
   private loadUsers(): void {
-    const { totalUsers, users } = this.userService.getPaginatedUsers(
+    const { users, totalUsers } = this.userService.getPaginatedUsers(
       this.currentPage,
       this.itemsPerPage,
       this.role,
       this.status,
       this.searchText
     );
-
     this.totalPages = Math.max(Math.ceil(totalUsers / this.itemsPerPage), 1);
-
-    if (this.currentPage > this.totalPages) {
-      this.currentPage = this.totalPages;
-      this.updateQueryParams({ page: this.currentPage });
-    } else if (this.currentPage < 1) {
-      this.currentPage = 1;
-      this.updateQueryParams({ page: 1 });
-    }
-
-    this.users = [...users];
+    if (this.currentPage > this.totalPages)
+      this.updateQueryParams({ page: this.totalPages });
+    else if (this.currentPage < 1) this.updateQueryParams({ page: 1 });
+    this.users = users;
   }
 
-  private initQueryParamsSubscription() {
+  /**
+   * Initializes and manages URL query parameters for user list filtering and pagination
+   * This method:
+   * 1. Subscribes to route query parameter changes
+   * 2. Extracts and validates page, limit, status, role and search parameters
+   * 3. Updates component state only when parameters actually change
+   * 4. Triggers user list reload when necessary
+   * 5. Handles initial load state to ensure first data fetch
+   *
+   * Query Parameters:
+   * - page: Current page number (default: 1)
+   * - limit: Items per page (default: 10)
+   * - status: User active status (true/false)
+   * - role: User role filter ('default' or UserRoleEnum)
+   * - search: Search text filter
+   * @private
+   */
+  private initQueryParams() {
+    let initialLoad = true;
     this.route.queryParams
       .pipe(takeUntil(this.destroy$))
       .subscribe((params: Params) => {
-        const page = Number(params['page']);
-        const limit = Number(params['limit']);
+        const page = +params['page'] || 1;
+        const limit = +params['limit'] || 10;
+        const status = params['status'] === 'false' ? false : true;
+        const role = params['role'] || 'default';
+        const search = params['search'] || '';
 
-        this.currentPage = !isNaN(page) && page > 0 ? page : 1;
-        this.itemsPerPage =
-          !isNaN(limit) && limit > 0 ? limit : this.itemsPerPage;
+        let shouldReload = false;
 
-        if (params['status'] === 'true') {
-          this.status = true;
-        } else if (params['status'] === 'false') {
-          this.status = false;
-        } else {
-          this.status = true;
+        if (this.currentPage !== page) {
+          this.currentPage = page;
+          shouldReload = true;
         }
-        this.role = params['role'] ? params['role'] : 'default';
-        this.searchText = params['search'];
-        this.loadUsers();
+        if (this.itemsPerPage !== limit) {
+          this.itemsPerPage = limit;
+          shouldReload = true;
+        }
+        if (this.status !== status) {
+          this.status = status;
+          shouldReload = true;
+        }
+        if (this.role !== role) {
+          this.role = role;
+          shouldReload = true;
+        }
+        if (this.searchText !== search) {
+          this.searchText = search;
+          shouldReload = true;
+        }
+
+        if (shouldReload || initialLoad) {
+          this.loadUsers();
+          initialLoad = false;
+        }
       });
   }
 

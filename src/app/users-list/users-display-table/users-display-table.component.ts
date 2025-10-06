@@ -9,6 +9,8 @@ import {
   OnDestroy,
 } from '@angular/core';
 import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
+import { ActivatedRoute, Params } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
 
 import { UserInterface } from 'src/app/types/user.interface';
 import { UserRoleEnum } from 'src/app/types/user-role.enum';
@@ -16,8 +18,6 @@ import {
   AdditionalFormDataInterFace,
   UserFromDataInterface,
 } from 'src/app/types/form-data.interface';
-import { ActivatedRoute, Params } from '@angular/router';
-import { Subject, Subscription, takeUntil } from 'rxjs';
 import { emailExistValidator } from 'src/app/validators/email-exist-validator';
 import { bulkEmailValidator } from 'src/app/validators/bulk-email-validator';
 
@@ -30,6 +30,7 @@ export class UsersDisplayTableComponent
   implements OnInit, OnChanges, OnDestroy
 {
   @Input() users: UserInterface[] = [];
+
   @Output() userDeleted = new EventEmitter<string>();
   @Output() userToggleStatus = new EventEmitter<string>();
   @Output() userUpdated = new EventEmitter<string>();
@@ -68,7 +69,7 @@ export class UsersDisplayTableComponent
     }
   }
 
-  //--------------- User Actions ------------------
+  //----------- User Actions ------------
   onUpdateUser(id?: string) {
     if (!id) return;
     this.userUpdated.emit(id);
@@ -84,13 +85,20 @@ export class UsersDisplayTableComponent
     this.userDeleted.emit(id);
   }
 
-  // ---------------- Inline Edit ----------------
+  /**
+   * Enables inline editing mode for a specific table row
+   */
   onEditRow(row: number) {
     this.editAll = false;
     this.editingRowIndex[row] = true;
     if (this.editingFields[row]) this.editingFields[row] = [];
   }
 
+  /**
+   * Saves changes made to a specific row and updates the backend
+   * 1. Retrieves the FormGroup for the specified row
+   * 2. Gets updated data by comparing against original values, emits update event with modified fields
+   */
   onSaveRow(row: number) {
     const rowGroup = this.userFormArray.at(row);
     const updatedData = this.getUpdatedData(rowGroup);
@@ -99,13 +107,21 @@ export class UsersDisplayTableComponent
     this.editingRowIndex[row] = false;
   }
 
+  /**
+   * Cancels editing and reverts any changes made to a row
+   * 1. Retrieves the FormGroup for the specified row
+   * 2. Reverts any dirty form controls to their original values
+   */
   onCancelRow(row: number) {
     const rowGroup = this.userFormArray.at(row);
     this.dirtyCancel(rowGroup, row);
     this.editingRowIndex[row] = false;
   }
 
-  //------------------ Bulk Edit ------------------
+  /**
+   * Enables bulk editing mode for all table rows
+   * Sets up bulk email validation for all rows
+   */
   onEditAll() {
     this.editAll = true;
     this.editingRowIndex = [];
@@ -113,6 +129,15 @@ export class UsersDisplayTableComponent
     this.setValidatorForBulkUpdate();
   }
 
+  /**
+   * Saves all modified rows in bulk edit mode
+   * 1. Iterates through all form groups in the form array
+   * 2. For each modified row:
+   *    - Collects updated field values
+   *    - Emits update event with changes
+   *    - Restores original validators
+   * 3. Clears bulk validation rules
+   */
   onSaveAll() {
     this.userFormArray.controls.forEach(
       (formGroup: FormGroup<UserFromDataInterface>, i) => {
@@ -127,6 +152,14 @@ export class UsersDisplayTableComponent
     this.usersForm.updateValueAndValidity();
   }
 
+  /**
+   * Cancels bulk edit mode and reverts all changes
+   * 1. Iterates through all form groups
+   * 2. For each row:
+   *    - Reverts any modified fields to original values
+   *    - Restores original validators
+   * 3. Clears bulk validation rules
+   */
   onCancelAll() {
     this.userFormArray.controls.forEach(
       (formGroup: FormGroup<UserFromDataInterface>, i) => {
@@ -139,13 +172,22 @@ export class UsersDisplayTableComponent
     this.usersForm.updateValueAndValidity();
   }
 
-  // ---------------- Field Edit ----------------
+  /**
+   * Enables edit mode for a specific field within a given row
+   */
   onEditField(row: number, field: keyof UserInterface) {
     if (!this.editingFields[row]) this.editingFields[row] = [];
     if (!this.editingFields[row].includes(field))
       this.editingFields[row].push(field);
   }
 
+  /**
+   * Saves the updated value for a specific field in a given row
+   * 1. Retrieves the FormGroup for the specified row
+   * 2. Checks if the target field’s control is dirty (modified)
+   *    - If yes, emits the updated data (id + changed field) to the parent component
+   * 3. Removes the field from the editingFields list to exit edit mode
+   */
   onSaveField(row: number, field: keyof UserInterface) {
     const formGroup = this.userFormArray.at(row);
     const fieldControl = formGroup.get(field);
@@ -159,23 +201,37 @@ export class UsersDisplayTableComponent
     this.editingFields[row].splice(index, 1);
   }
 
+  /**
+   * Cancel editing for a specific field in a given row
+   * 1. Removes the target field from the editingFields list (disables edit mode)
+   * 2. Handles 'additional' field as a special case (skips restoration logic)
+   * 3. Retrieves the corresponding FormControl for the field
+   * 4. If the field was modified (dirty):
+   *    - Restores the original value from the users array
+   *    - Marks the control as pristine (unmodified)
+   */
   onCancelField(row: number, field: keyof UserInterface) {
     if (this.editingFields[row]) {
       const index = this.editingFields[row].indexOf(field);
       if (index >= 0) this.editingFields[row].splice(index, 1);
     }
+
+    if (field === 'additional') return;
+
     const formGroup = this.userFormArray.at(row);
     const control = formGroup.get(field);
-    if (field === 'additional') {
-    } else {
-      if (control?.dirty) {
-        control.setValue(this.users[row][field]);
-        control.markAsPristine();
-      }
+    if (control?.dirty) {
+      control.setValue(this.users[row][field]);
+      control.markAsPristine();
     }
   }
 
-  //-------------- Add new column --------------
+  /**
+   * Enable adding a new key-value column for a specific row
+   * 1. Marks the row as currently adding a column (addColumn[row] = true)
+   * 2. Initializes a new FormGroup for the key and value inputs with required validators
+   * 3. Stores the form in addColumnForm at the specified row index
+   */
   onAddColumn(row: number) {
     this.addColumn[row] = true;
     this.addColumnForm[row] = new FormGroup({
@@ -190,9 +246,16 @@ export class UsersDisplayTableComponent
     });
   }
 
+  /**
+   * Save the new key-value column for a specific row
+   * 1. Retrieves the temporary form for the row
+   * 2. Retrieves the 'additional' FormArray for the user row
+   * 3. Pushes a new FormGroup with the key-value into the FormArray
+   * 4. Emits userBulkFieldUpdate with the updated additional fields, Resets addColumn[row] to false
+   */
   onSaveColumn(row: number) {
     const tempForm = this.addColumnForm[row];
-    if (!tempForm.valid) return;
+    if (tempForm.invalid) return;
     const newField = tempForm.value;
     const additionalFields = this.userFormArray
       .at(row)

@@ -1,47 +1,64 @@
 <section>
-  <div>
-    <!-- Add & Edit Buttons -->
+  <div class="top-row">
     <button (click)="onAddUser()">Add User</button>
 
-    <!-- Status Filter -->
-    <div>
+    <form #statusForm="ngForm" class="status-form">
       <span>Status:</span>
       <label>
-        <input type="radio" name="statusFilter" [value]="true" [(ngModel)]="statusFilter"
-          (change)="onStatusFilterChange()" />
+        <input
+          name="status"
+          type="radio"
+          [value]="true"
+          [(ngModel)]="status"
+          (change)="onStatusChange()"
+        />
         Active
       </label>
       <label>
-        <input type="radio" name="statusFilter" [value]="false" [(ngModel)]="statusFilter"
-          (change)="onStatusFilterChange()" />
+        <input
+          name="status"
+          type="radio"
+          [value]="false"
+          [(ngModel)]="status"
+          (change)="onStatusChange()"
+        />
         Inactive
       </label>
-    </div>
+    </form>
 
-    <!-- Role Filter -->
-    <div>
-      <label for="roleFilter">Role:</label>
-      <select (change)="onRoleFilterChange()" [(ngModel)]="roleFilter">
+    <form #roleForm="ngForm" class="role-form">
+      <label>Role:</label>
+      <select name="role" [(ngModel)]="role" (change)="onRoleChange()">
         <option value="default">Default</option>
         <option *ngFor="let role of roles" [value]="role">
           {{ role | titlecase }}
         </option>
       </select>
-    </div>
+    </form>
 
-    <!-- Items Per Page -->
-    <div>
+    <form #itemsForm="ngForm" class="items-form">
       <label for="itemsPerPage">Show:</label>
-      <select [(ngModel)]="itemsPerPageFilter" (change)="onItemsPerPageFilterChange()">
+      <select
+        name="itemsPerPage"
+        [(ngModel)]="itemPerPage"
+        (change)="onItemPerPageChange()"
+      >
         <option [value]="number" *ngFor="let number of [5, 10, 15, 20]">
           {{ number }}
         </option>
       </select>
-    </div>
+    </form>
   </div>
 
-  <!-- Search -->
-  <div>
-    <input type="text" placeholder="Search by name, email, or phone..." [formControl]="searchControl" />
+  <div class="bottom-row">
+    <form #searchForm="ngForm" class="search-form">
+      <input
+        type="text"
+        name="search"
+        placeholder="Search by name, email, or phone..."
+        [(ngModel)]="searchText"
+        (ngModelChange)="onSearchChange()"
+      />
+    </form>
   </div>
 </section>

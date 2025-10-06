@@ -5,15 +5,9 @@ import {
   EventEmitter,
   OnDestroy,
 } from '@angular/core';
-import { FormControl } from '@angular/forms';
+
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import {
-  debounceTime,
-  distinctUntilChanged,
-  Subject,
-  Subscription,
-  takeUntil,
-} from 'rxjs';
+import { debounceTime, distinctUntilChanged, Subject, takeUntil } from 'rxjs';
 
 import { StatusType } from 'src/app/types/status.type';
 import { UserRoleEnum } from 'src/app/types/user-role.enum';
@@ -24,59 +18,85 @@ import { UserRoleEnum } from 'src/app/types/user-role.enum';
   styleUrls: ['./users-filtered-features.component.css'],
 })
 export class UsersFilteredFeaturesComponent implements OnInit, OnDestroy {
-  @Output() statusFilterChanged = new EventEmitter<StatusType>();
-  @Output() roleFilterChanged = new EventEmitter<UserRoleEnum | 'default'>();
-  @Output() itemPerPageFilterChanged = new EventEmitter<number>();
-  @Output() searchChanged = new EventEmitter<string>();
+  @Output() statusChange = new EventEmitter<StatusType>();
+  @Output() roleChange = new EventEmitter<UserRoleEnum | 'default'>();
+  @Output() itemPerPageChange = new EventEmitter<number>();
+  @Output() searchChange = new EventEmitter<string>();
 
   roles: UserRoleEnum[] = Object.values(UserRoleEnum);
 
-  statusFilter: StatusType = true;
-  itemsPerPageFilter: number = 10;
-  roleFilter: UserRoleEnum | 'default' = 'default';
+  status: StatusType = true;
+  itemPerPage: number = 10;
+  role: UserRoleEnum | 'default' = 'default';
+  searchText: string = '';
 
-  searchControl = new FormControl();
-
+  private searchSubject$ = new Subject<string>();
   private destroy$ = new Subject<void>();
 
   constructor(private route: ActivatedRoute, private router: Router) {}
 
   ngOnInit(): void {
-    this.searchControl.valueChanges
-      .pipe(debounceTime(500), distinctUntilChanged(), takeUntil(this.destroy$))
-      .subscribe((val) => this.searchChanged.emit(val));
-
-    this.route.queryParams
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((params: Params) => {
-        const limit = Number(params['limit']);
-        this.itemsPerPageFilter = !isNaN(limit) && limit > 0 ? limit : 10;
-        if (params['status'] === 'true') {
-          this.statusFilter = true;
-        } else if (params['status'] === 'false') {
-          this.statusFilter = false;
-        } else {
-          this.statusFilter = true;
-        }
-        this.roleFilter = params['role'] ? params['role'] : 'default';
-        this.searchControl.setValue(params['search']);
-      });
+    this.initSearch();
+    this.initQueryParams();
   }
 
   onAddUser() {
     this.router.navigate(['add-user']);
   }
 
-  onStatusFilterChange() {
-    this.statusFilterChanged.emit(this.statusFilter);
+  onStatusChange() {
+    this.statusChange.emit(this.status);
   }
 
-  onRoleFilterChange() {
-    this.roleFilterChanged.emit(this.roleFilter);
+  onRoleChange() {
+    this.roleChange.emit(this.role);
   }
 
-  onItemsPerPageFilterChange() {
-    this.itemPerPageFilterChanged.emit(this.itemsPerPageFilter);
+  onItemPerPageChange() {
+    this.itemPerPageChange.emit(this.itemPerPage);
+  }
+
+  onSearchChange() {
+    this.searchSubject$.next(this.searchText);
+  }
+
+  /**
+   * Initializes search functionality with debouncing
+
+   * Sets up a subscription to handle search text changes with:
+   * - 500ms debounce time to reduce API calls
+   * - Distinct until changed to avoid duplicate searches
+   * - Automatic cleanup on component destroy
+   *
+   * Emits the search value through searchChange EventEmitter
+   * when the debounced search value changes
+   */
+  private initSearch() {
+    this.searchSubject$
+      .pipe(debounceTime(500), distinctUntilChanged(), takeUntil(this.destroy$))
+      .subscribe((value) => {
+        this.searchChange.emit(value);
+      });
+  }
+
+  /**
+   * Initializes component state from URL query parameters
+   * Subscribes to route query parameters and updates the component's filter states:
+   * - itemPerPage: Number of items to display per page (default: 10)
+   * - status: User active status filter (default: true)
+   * - role: User role filter (default: 'default')
+   * - searchText: Search query filter (default: '')
+   * The subscription is automatically cleaned up on component destroy via takeUntil
+   */
+  private initQueryParams() {
+    this.route.queryParams
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((params: Params) => {
+        this.itemPerPage = +params['limit'] || 10;
+        this.status = params['status'] === 'false' ? false : true;
+        this.role = params['role'] || 'default';
+        this.searchText = params['search'] || '';
+      });
   }
 
   ngOnDestroy() {
