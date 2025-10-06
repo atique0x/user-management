@@ -9,8 +9,8 @@ import {
   OnDestroy,
 } from '@angular/core';
 import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, Params } from '@angular/router';
-import { Subject, takeUntil } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
+import { Subject } from 'rxjs';
 
 import { UserInterface } from 'src/app/types/user.interface';
 import { UserRoleEnum } from 'src/app/types/user-role.enum';
@@ -30,6 +30,8 @@ export class UsersDisplayTableComponent
   implements OnInit, OnChanges, OnDestroy
 {
   @Input() users: UserInterface[] = [];
+  @Input() currentPage: number = 1;
+  @Input() itemsPerPage: number = 10;
 
   @Output() userDeleted = new EventEmitter<string>();
   @Output() userToggleStatus = new EventEmitter<string>();
@@ -49,16 +51,12 @@ export class UsersDisplayTableComponent
   addColumn: boolean[] = [];
   addColumnForm: FormGroup<AdditionalFormDataInterFace>[] = [];
 
-  currentPage = 1;
-  itemsPerPage = 10;
-
   private destroy$ = new Subject<void>();
 
-  constructor(private route: ActivatedRoute) {}
+  constructor() {}
 
   ngOnInit(): void {
     this.setupUsersForm();
-    this.handleRouteParams();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -91,7 +89,7 @@ export class UsersDisplayTableComponent
   onEditRow(row: number) {
     this.editAll = false;
     this.editingRowIndex[row] = true;
-    if (this.editingFields[row]) this.editingFields[row] = [];
+    this.editingFields[row] = [];
   }
 
   /**
@@ -256,6 +254,7 @@ export class UsersDisplayTableComponent
   onSaveColumn(row: number) {
     const tempForm = this.addColumnForm[row];
     if (tempForm.invalid) return;
+
     const newField = tempForm.value;
     const additionalFields = this.userFormArray
       .at(row)
@@ -273,9 +272,9 @@ export class UsersDisplayTableComponent
         }),
       })
     );
-    const userId = this.userFormArray.at(row).value.id!;
+
     this.userBulkFieldUpdate.emit({
-      id: userId,
+      id: this.userFormArray.at(row).value.id!,
       updatedData: { additional: additionalFields.value },
     });
     this.addColumn[row] = false;
@@ -381,19 +380,6 @@ export class UsersDisplayTableComponent
           ),
         })
     );
-  }
-
-  private handleRouteParams() {
-    this.route.queryParams
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((params: Params) => {
-        const page = Number(params['page']);
-        const limit = Number(params['limit']);
-
-        this.currentPage = !isNaN(page) && page > 0 ? page : 1;
-        this.itemsPerPage =
-          !isNaN(limit) && limit > 0 ? limit : this.itemsPerPage;
-      });
   }
 
   private dirtyCancel(

@@ -5,10 +5,16 @@
   (roleChange)="handleRoleChange($event)"
   (itemPerPageChange)="handleItemsPerPageChange($event)"
   (searchChange)="handleSearchChange($event)"
+  [status]="status"
+  [role]="role"
+  [itemPerPage]="itemsPerPage"
+  [searchText]="searchText"
 ></app-users-filtered-features>
 
 <app-users-display-table
   [users]="users"
+  [itemsPerPage]="itemsPerPage"
+  [currentPage]="currentPage"
   (userDeleted)="handleUserDelete($event)"
   (userToggleStatus)="handleToggleStatus($event)"
   (userUpdated)="handleUpdateUser($event)"
