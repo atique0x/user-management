@@ -1,14 +1,14 @@
 <h2>User List</h2>
 
 <app-users-filtered-features
-  (statusChange)="handleStatusChange($event)"
-  (roleChange)="handleRoleChange($event)"
-  (itemPerPageChange)="handleItemsPerPageChange($event)"
-  (searchChange)="handleSearchChange($event)"
   [status]="status"
   [role]="role"
   [itemPerPage]="itemsPerPage"
   [searchText]="searchText"
+  (statusChange)="handleStatusChange($event)"
+  (roleChange)="handleRoleChange($event)"
+  (itemPerPageChange)="handleItemsPerPageChange($event)"
+  (searchChange)="handleSearchChange($event)"
 ></app-users-filtered-features>
 
 <app-users-display-table
